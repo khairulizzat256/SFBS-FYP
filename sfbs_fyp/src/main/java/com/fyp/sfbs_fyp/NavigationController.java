@@ -31,5 +31,10 @@ public class NavigationController {
         return "aboutUs"; 
     }
 
+    @GetMapping("/contact")
+    public String showcontactPage() {
+        return "contact"; 
+    }
+
     
 }
