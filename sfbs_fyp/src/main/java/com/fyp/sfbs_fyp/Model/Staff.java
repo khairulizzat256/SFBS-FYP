@@ -7,13 +7,15 @@ public class Staff {
     private String staffEmail;
     private String staffPhone;
     private String staffRole;
+    private String staffPassword;
 
-    public Staff(String staffID, String staffName, String staffEmail, String staffPhone, String staffRole) {
+    public Staff(String staffID, String staffName, String staffEmail, String staffPhone, String staffRole, String staffPassword) {
         this.staffID = staffID;
         this.staffName = staffName;
         this.staffEmail = staffEmail;
         this.staffPhone = staffPhone;
         this.staffRole = staffRole;
+        this.staffPassword = staffPassword;
     }
 
     public String getStaffID() {

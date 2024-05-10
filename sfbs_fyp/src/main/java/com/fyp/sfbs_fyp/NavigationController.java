@@ -36,5 +36,10 @@ public class NavigationController {
         return "contact"; 
     }
 
+    @GetMapping("/AddStaff")
+    public String showAddStaffPage() {
+        return "addstaff"; 
+    }
+
     
 }

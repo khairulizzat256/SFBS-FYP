@@ -6,15 +6,17 @@ public class Facility {
     private String facilityName;
     private String facilityID;
     private double facilityPrice;
-    private Time facilityOpenTime;
-    private Time facilityCloseTime;
+    private String facilityOpenTime;
+    private String facilityCloseTime;
 
-    public Facility(String facilityName, String facilityID, double facilityPrice, Time facilityOpenTime, Time facilityCloseTime) {
+    public Facility(String facilityName, String facilityID, double facilityPrice, String facilityOpenTime, String facilityCloseTime) {
         this.facilityName = facilityName;
         this.facilityID = facilityID;
         this.facilityPrice = facilityPrice;
         this.facilityOpenTime = facilityOpenTime;
         this.facilityCloseTime = facilityCloseTime;
+    }
+    public Facility() {
     }
 
     public String getFacilityName() {
@@ -41,19 +43,19 @@ public class Facility {
         this.facilityPrice = facilityPrice;
     }
 
-    public Time getFacilityOpenTime() {
+    public String getFacilityOpenTime() {
         return facilityOpenTime;
     }
 
-    public void setFacilityOpenTime(Time facilityOpenTime) {
+    public void setFacilityOpenTime(String facilityOpenTime) {
         this.facilityOpenTime = facilityOpenTime;
     }
 
-    public Time getFacilityCloseTime() {
+    public String getFacilityCloseTime() {
         return facilityCloseTime;
     }
 
-    public void setFacilityCloseTime(Time facilityCloseTime) {
+    public void setFacilityCloseTime(String facilityCloseTime) {
         this.facilityCloseTime = facilityCloseTime;
     }
 
