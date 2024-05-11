@@ -43,6 +43,12 @@
 
     <div class="container">
         <h1>Welcome to the Admin Dashboard</h1>
+        <div th:if="${user != null}">
+            <p th:text="'Email: ' + ${user.getEmail()}"></p>
+        </div>
+        <div th:if="${TokenID != null}">
+            <p th:text="'Token ID: ' + ${TokenID}"></p>
+        </div>
         <!-- Add your admin page content here -->
         <button class="btn btn-primary add-staff-btn" th:href="AddStaff">Add Staff</button>
     </div>

@@ -41,5 +41,10 @@ public class NavigationController {
         return "addstaff"; 
     }
 
+    @GetMapping("/signup")
+    public String showsignup() {
+        return "signup"; 
+    }
+
     
 }

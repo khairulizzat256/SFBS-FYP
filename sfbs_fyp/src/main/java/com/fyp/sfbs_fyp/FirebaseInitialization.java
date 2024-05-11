@@ -1,11 +1,11 @@
 package com.fyp.sfbs_fyp;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
 
-import com.fyp.sfbs_fyp.Model.Facility;
-import com.fyp.sfbs_fyp.Service.FacilityService;
-
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.DataSnapshot;
@@ -21,9 +21,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @Service
+@Configuration
 public class FirebaseInitialization {
 
-    private boolean isInitialized = false;
+    private boolean isInitialized;
+
+    @Bean
+    public FirebaseAuth firebaseAuth() {
+        return FirebaseAuth.getInstance();
+    }
 
     @PostConstruct
     public void Initialization() {
@@ -47,8 +53,10 @@ public class FirebaseInitialization {
                     "}";
 
             InputStream serviceAccount = new ByteArrayInputStream(serviceAccountKeyJson.getBytes());
+            @SuppressWarnings("deprecation")
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setServiceAccountId("113861329637993690965@sfbs-19116.iam.gserviceaccount.com")
                     .setDatabaseUrl("https://sfbs-19116-default-rtdb.asia-southeast1.firebasedatabase.app")
                     .build();
 
@@ -56,35 +64,36 @@ public class FirebaseInitialization {
             System.out.println("\n\nDATABASE CONNECTION ESTABLISHED!\n\n");
             isInitialized = true;
             
-            //ESTABLISH COUNT IN DATABASE
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference countRef = database.getReference("RunCount");
+                        //ESTABLISH COUNT IN DATABASE
+                        FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        DatabaseReference countRef = database.getReference("RunCount");
 
-            countRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        Integer count = dataSnapshot.getValue(Integer.class);
-                        count++;
-                        countRef.setValue(count, null);
-                    } else {
-                        countRef.setValue(1, null);
-                    }
-                    
-                    // Add current timestamp with date and time
-                    DatabaseReference timestampRef = database.getReference("Timestamp");
-                    String currentTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                    timestampRef.setValue(currentTimestamp, null);
-                }
+                        countRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (dataSnapshot.exists()) {
+                                    Integer count = dataSnapshot.getValue(Integer.class);
+                                    count++;
+                                    countRef.setValue(count, null);
+                                } else {
+                                    countRef.setValue(1, null);
+                                }
+                                
+                                // Add current timestamp with date and time
+                                DatabaseReference timestampRef = database.getReference("Timestamp");
+                                String currentTimestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                                timestampRef.setValue(currentTimestamp, null);
+                            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    System.out.println("Failed to read timestamp value: " + databaseError.getMessage());
-                }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                System.out.println("Failed to read timestamp value: " + databaseError.getMessage());
+                            }
             });
 
         } catch (Exception e) {
-            System.out.println("\n\nDATABASE COULD NOT BE CONNECTED\n\n");
+            System.out.println("\n\nDATABASE COULD NOT BE CONNECTED");
+            System.out.println(e.getMessage());
             e.printStackTrace();
         }
     }
