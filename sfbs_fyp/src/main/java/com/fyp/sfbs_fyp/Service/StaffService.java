@@ -1,37 +1,42 @@
 package com.fyp.sfbs_fyp.Service;
 
 import com.fyp.sfbs_fyp.Model.Staff;
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.WriteResult;
-import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Service;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.ListUsersPage;
+import com.google.firebase.auth.UserRecord;
 
-import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
+import java.util.List;
+
+
 
 @Service
 public class StaffService {
 
-    public void saveStaff(Staff staff) {
-        // Get Firestore instance using Firebase Admin SDK
-        Firestore firestore = FirestoreClient.getFirestore();
+    //Get Staff List
+    public List<Staff> getStaffList() throws FirebaseAuthException {
+        List<Staff> staffList = new ArrayList<>();
 
-        // Save staff data to Firestore
-        try {
-            // You may want to generate a unique ID for the document if staffID is not provided
-            // String staffId = UUID.randomUUID().toString();
-            // staff.setStaffID(staffId);
-
-            // Set the staff document in the "staff" collection with the staffID as the document ID
-            ApiFuture<WriteResult> result = firestore.collection("staff").document(staff.getStaffID()).set(staff);
-            
-            // Log the update time
-            System.out.println("Update time: " + result.get().getUpdateTime());
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            System.out.println("/n/n COULD NOT SAVE TO FIRESTORE/n/n");
-            // Handle the exception appropriately
+        ListUsersPage page = FirebaseAuth.getInstance().listUsers(null);
+       
+        while (page != null) {
+            for (UserRecord userRecord : page.getValues()) {
+                Staff staff = new Staff();
+                staff.setStaffID(userRecord.getUid());
+                staff.setStaffEmail(userRecord.getEmail());
+                staff.setStaffName(userRecord.getDisplayName());
+                staff.setStaffPhone(userRecord.getPhoneNumber());
+                
+                staffList.add(staff);
+            }
+            page = page.getNextPage();
         }
+        // for (int j = 0; j < staffList.size(); j++) {
+        //     System.out.println("\n\n Staff Service" + j+ ". " + staffList.get(j).getStaffEmail());
+        // }
+        return staffList;
     }
 }
 

@@ -17,6 +17,10 @@ public class Staff {
         this.staffRole = staffRole;
         this.staffPassword = staffPassword;
     }
+    
+    public Staff() {
+    }
+
 
     public String getStaffID() {
         return staffID;
