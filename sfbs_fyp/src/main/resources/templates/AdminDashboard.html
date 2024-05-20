@@ -23,48 +23,74 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" >BOOKING</a>
+                        <a class="nav-link" href="#" onclick="showSection('booking-section')">BOOKING</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" >STAFF</a>
+                        <a class="nav-link" href="#" onclick="showSection('staff-section')">STAFF</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" >REPORT</a>
+                        <a class="nav-link" href="#" onclick="showSection('report-section')">REPORT</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ml-auto">
+                    
                     <li class="nav-item">
                         <a class="nav-link" onclick="signOut()" href="#">LOGOUT</a>
                     </li>
+                </ul>
+            </div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" th:text="'Logged in as ' + ${session.user}"></a>
+                    </li>
+                    
                 </ul>
             </div>
         </div>
     </nav>
 
     <div class="container">
-        <h1>Welcome to the Admin Dashboard</h1>
-        <div th:if="${user != null}">
-            <p th:text="'Email: ' + ${user.getEmail()}"></p>
-            
-                
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Email</th>
-                            <th>ID</th>
-                            <th>Name</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="staff : ${staffList}">
-                            <td th:text="${staff.getStaffEmail}"></td>
-                            <td th:text="${staff.getStaffID}"></td>
-                            <td th:text="${staff.getStaffName}"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            
-        </dizv>
+        <h1 class="text-center">Welcome to the Admin Dashboard</h1>
+
+        <!-- Booking Section -->
+        <div id="booking-section" class="content-section">
+            <h2>Booking List</h2>
+            <!-- Booking list content goes here -->
+        </div>
+
+        <!-- Staff Section -->
+        <div id="staff-section" class="content-section" style="display:none;">
+            <h2>Staff List</h2>
+            <a th:href = "@{/Admin/AddStaff}"class="btn btn-success">Add Staff</a>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="staff : ${staffList}">
+                        <td th:text="${staff.getStaffName}"></td>
+                        <td th:text="${staff.getStaffPhone}"></td>
+                        <td th:text="${staff.getStaffEmail}"></td>
+                        <td>
+                            <a th:href="@{/Admin/editStaff(uid=${staff.getStaffID()})}" class="btn btn-primary">Edit</a>
+                            <a th:href="@{/Admin/deleteStaff(uid=${staff.getStaffID()})}" class="btn btn-danger">Delete</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Report Section -->
+        <div id="report-section" class="content-section" style="display:none;">
+            <h2>Report List</h2>
+            <!-- Report content goes here -->
+        </div>
     </div>
 
     <!-- Bootstrap JS -->
@@ -72,10 +98,22 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script th:src="@{/firebase.js}"></script>
     <script th:src="@{/authSignOut.js}"></script>
+
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            var sections = document.getElementsByClassName('content-section');
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].style.display = 'none';
+            }
+
+            // Show the selected section
+            document.getElementById(sectionId).style.display = 'block';
+        }
+    </script>
 </body>
 </html>

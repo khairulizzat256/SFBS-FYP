@@ -1,6 +1,5 @@
 package com.fyp.sfbs_fyp.Model;
 
-import java.sql.Time;
 
 public class Facility {
     private String facilityName;

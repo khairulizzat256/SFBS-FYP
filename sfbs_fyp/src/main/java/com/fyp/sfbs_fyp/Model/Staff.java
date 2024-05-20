@@ -17,7 +17,18 @@ public class Staff {
         this.staffRole = staffRole;
         this.staffPassword = staffPassword;
     }
+
     
+    
+    public Staff(String staffID, String staffName, String staffEmail, String staffPhone, String staffRole) {
+        this.staffID = staffID;
+        this.staffName = staffName;
+        this.staffEmail = staffEmail;
+        this.staffPhone = staffPhone;
+        this.staffRole = staffRole;
+    }
+
+
     public Staff() {
     }
 

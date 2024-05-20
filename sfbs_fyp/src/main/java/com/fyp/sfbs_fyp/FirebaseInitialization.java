@@ -60,6 +60,8 @@ public class FirebaseInitialization {
                     .setDatabaseUrl("https://sfbs-19116-default-rtdb.asia-southeast1.firebasedatabase.app")
                     .build();
 
+            
+
             FirebaseApp.initializeApp(options);
             System.out.println("\n\nDATABASE CONNECTION ESTABLISHED!\n\n");
             isInitialized = true;
@@ -89,10 +91,10 @@ public class FirebaseInitialization {
                             public void onCancelled(DatabaseError databaseError) {
                                 System.out.println("Failed to read timestamp value: " + databaseError.getMessage());
                             }
+            
             });
 
         } catch (Exception e) {
-            System.out.println("\n\nDATABASE COULD NOT BE CONNECTED");
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
