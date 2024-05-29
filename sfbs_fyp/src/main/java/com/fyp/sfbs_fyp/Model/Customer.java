@@ -14,6 +14,9 @@ public class Customer {
         this.customerEmail = customerEmail;
     }
 
+    public Customer() {
+    }
+
     // Getters and Setters
     public int getCustomerID() {
         return customerID;

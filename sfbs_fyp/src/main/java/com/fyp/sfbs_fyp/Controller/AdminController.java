@@ -74,7 +74,7 @@ public class AdminController {
 
         StaffService staffService = new StaffService();
         Staff newstaff = new Staff("", staffName, staffemail, staffPhone, staffRole);
-        System.out.println("\n\n\nSAVE DATA\n\n\n");
+        System.out.println("\n\n\nSAVE USER\n\n\n");
         staffService.saveStaff(newstaff);
         //model.addAttribute("staff", staffService.getStaff(staffID));
         return "redirect:/Admin/dashboard?uid=" + session.getAttribute("user");
@@ -86,4 +86,10 @@ public class AdminController {
         staffService.deleteStaff(staffID);
         return "redirect:/Admin/dashboard?uid=" + session.getAttribute("user");
     }
+    
+    @GetMapping("/forgotPassword")
+    public String forgotPasswordForm() {
+        return "forgotPassword";
+    }
+    
 }
