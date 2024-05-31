@@ -1,7 +1,9 @@
 package com.fyp.sfbs_fyp;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class NavigationController {
@@ -17,7 +19,10 @@ public class NavigationController {
     }
 
     @GetMapping("/booking")
-    public String showBookingPage() {
+    public String showBookingPage(@RequestParam(value = "message", required = false) String message, Model model) {
+        if (message != null) {
+            model.addAttribute("message", message);
+        }
         return "booking"; 
     }
 

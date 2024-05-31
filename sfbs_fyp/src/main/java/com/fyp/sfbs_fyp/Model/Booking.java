@@ -1,21 +1,23 @@
 package com.fyp.sfbs_fyp.Model;
 
-import java.sql.Date;
-import java.sql.Time;
+import com.google.cloud.firestore.annotation.DocumentId;
+import com.google.cloud.firestore.annotation.PropertyName;
 
 public class Booking {
-    private int bookingID;
+
+    @DocumentId
+    private String bookingID;
     private String bookingType;
-    private Date bookingDate;
-    private Time bookingStartTime;
-    private Time bookingEndTime;
+    private String bookingDate;
+    private String bookingStartTime;
+    private String bookingEndTime;
     private String description;
     private Facility facilityID;
     private Customer customerID;
     private Company companyID;
 
     //Constructor with CompanyID
-    public Booking(int bookingID, String bookingType, Date bookingDate, Time bookingStartTime, Time bookingEndTime, String description, Facility facilityID, Customer customerID, Company companyID) {
+    public Booking(String bookingID, String bookingType, String bookingDate, String bookingStartTime, String bookingEndTime, String description, Facility facilityID, Customer customerID, Company companyID) {
         this.bookingID = bookingID;
         this.bookingType = bookingType;
         this.bookingDate = bookingDate;
@@ -28,7 +30,7 @@ public class Booking {
     }
     
     //Constructor without CompanyID
-    public Booking(int bookingID, String bookingType, Date bookingDate, Time bookingStartTime, Time bookingEndTime,
+    public Booking(String bookingID, String bookingType, String bookingDate, String bookingStartTime, String bookingEndTime,
             String description, Facility facilityID, Customer customerID) {
         this.bookingID = bookingID;
         this.bookingType = bookingType;
@@ -44,11 +46,11 @@ public class Booking {
     public Booking() {
     }
 
-    public int getBookingID() {
+    public String getBookingID() {
         return bookingID;
     }
 
-    public void setBookingID(int bookingID) {
+    public void setBookingID(String bookingID) {
         this.bookingID = bookingID;
     }
 
@@ -60,27 +62,27 @@ public class Booking {
         this.bookingType = bookingType;
     }
 
-    public Date getBookingDate() {
+    public String getBookingDate() {
         return bookingDate;
     }
 
-    public void setBookingDate(Date bookingDate) {
+    public void setBookingDate(String bookingDate) {
         this.bookingDate = bookingDate;
     }
 
-    public Time getBookingStartTime() {
+    public String getBookingStartTime() {
         return bookingStartTime;
     }
 
-    public void setBookingStartTime(Time bookingStartTime) {
+    public void setBookingStartTime(String bookingStartTime) {
         this.bookingStartTime = bookingStartTime;
     }
 
-    public Time getBookingEndTime() {
+    public String getBookingEndTime() {
         return bookingEndTime;
     }
 
-    public void setBookingEndTime(Time bookingEndTime) {
+    public void setBookingEndTime(String bookingEndTime) {
         this.bookingEndTime = bookingEndTime;
     }
 
@@ -92,27 +94,35 @@ public class Booking {
         this.description = description;
     }
 
+    @PropertyName("facility")
     public Facility getFacilityID() {
         return facilityID;
     }
-
+    @PropertyName("facility")
     public void setFacilityID(Facility facilityID) {
         this.facilityID = facilityID;
     }
-
+    @PropertyName("customer")
     public Customer getCustomerID() {
         return customerID;
     }
-
+    @PropertyName("customer")
     public void setCustomerID(Customer customerID) {
         this.customerID = customerID;
     }
-
+    @PropertyName("company")
     public Company getCompanyID() {
         return companyID;
     }
-
+    @PropertyName("company")
     public void setCompanyID(Company companyID) {
         this.companyID = companyID;
+    }
+
+    public String toString() {
+        return "Booking ID: " + bookingID + "\nBooking Type: " + bookingType + "\nBooking Date: " + bookingDate
+                + "\nBooking Start Time: " + bookingStartTime + "\nBooking End Time: " + bookingEndTime
+                + "\nDescription: " + description + "\nFacility ID: " + facilityID + "\nCustomer ID: " + customerID
+                + "\nCompany ID: " + companyID;
     }
 }

@@ -14,6 +14,8 @@ public class Company {
         this.eventName = eventName;
         this.service = service;
     }
+    public Company() {
+    }
 
     public String getCompanyID() {
         return companyID;
