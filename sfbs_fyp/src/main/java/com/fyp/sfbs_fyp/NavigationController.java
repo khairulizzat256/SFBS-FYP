@@ -1,12 +1,20 @@
 package com.fyp.sfbs_fyp;
 
+import java.util.concurrent.ExecutionException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.fyp.sfbs_fyp.Service.BookingService;
+
 @Controller
 public class NavigationController {
+
+    @Autowired
+    BookingService bookingService;
 
     @GetMapping("/")
     public String test() {
@@ -19,10 +27,16 @@ public class NavigationController {
     }
 
     @GetMapping("/booking")
-    public String showBookingPage(@RequestParam(value = "message", required = false) String message, Model model) {
+    public String showBookingPage(@RequestParam(value = "message", required = false) String message, Model model) throws InterruptedException, ExecutionException {
         if (message != null) {
             model.addAttribute("message", message);
         }
+
+        bookingService.retrieveBookingList();
+
+        bookingService.getBookingEvents();
+        model.addAttribute("response", bookingService.getBookingEvents());
+
         return "booking"; 
     }
 

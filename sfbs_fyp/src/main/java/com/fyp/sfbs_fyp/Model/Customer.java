@@ -1,13 +1,13 @@
 package com.fyp.sfbs_fyp.Model;
 
 public class Customer {
-    private int customerID;
+    private String customerID;
     private String customerName;
     private String customerPhone;
     private String customerEmail;
 
     // Constructor
-    public Customer(int customerID, String customerName, String customerPhone, String customerEmail) {
+    public Customer(String customerID, String customerName, String customerPhone, String customerEmail) {
         this.customerID = customerID;
         this.customerName = customerName;
         this.customerPhone = customerPhone;
@@ -18,11 +18,11 @@ public class Customer {
     }
 
     // Getters and Setters
-    public int getCustomerID() {
+    public String getCustomerID() {
         return customerID;
     }
 
-    public void setCustomerID(int customerID) {
+    public void setCustomerID(String customerID) {
         this.customerID = customerID;
     }
 
@@ -48,5 +48,9 @@ public class Customer {
 
     public void setCustomerEmail(String customerEmail) {
         this.customerEmail = customerEmail;
+    }
+
+    public String toString() {
+        return "Customer ID: " + customerID + "\nCustomer Name: " + customerName + "\nCustomer Phone: " + customerPhone + "\nCustomer Email: " + customerEmail;
     }
 }

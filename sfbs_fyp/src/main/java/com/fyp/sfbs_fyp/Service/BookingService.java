@@ -1,7 +1,9 @@
 package com.fyp.sfbs_fyp.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.stereotype.Service;
@@ -48,11 +50,13 @@ public class BookingService {
     }
 
     //compare date and time of retrieved booking data with the date and time in firestore
-    public boolean compareDateTime(String bookingDate, String bookingStartTime, String bookingEndTime, String facilityID) throws InterruptedException, ExecutionException {
+    public boolean ValidateDateTime(String bookingDate, String bookingStartTime, String bookingEndTime, String facilityID) throws InterruptedException, ExecutionException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         CollectionReference booking = dbFirestore.collection("Booking");
         ApiFuture<QuerySnapshot> query = booking.get();
         QuerySnapshot querySnapshot = query.get();
+
+        // Check if the booking date and time is available
         for (QueryDocumentSnapshot document : querySnapshot) {
             Booking bookingData = document.toObject(Booking.class);
             if (bookingData.getFacilityID().getFacilityID().equals(facilityID)) {
@@ -63,8 +67,41 @@ public class BookingService {
                 }
             }
         }
+
+        //Check if the booking date and time not passed
+        if (bookingDate.compareTo(java.time.LocalDate.now().toString()) < 0) {
+            return false;
+        }
+
+        //Check if the booking start time and end time is not the same or the start time is not later than the end time
+        if(bookingStartTime.compareTo(bookingEndTime) >= 0) {
+            return false;
+        }
+
+        //Check if the start time and end time is available (08:00 - 22:00)
+        if(bookingStartTime.compareTo("08:00") < 0 || bookingEndTime.compareTo("22:00") > 0) {
+            return false;
+        }
+
         return true;
     }
 
+    //Get the event, date, start time and end time of the booking
+    public List<Map<String, Object>> getBookingEvents() throws InterruptedException, ExecutionException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        CollectionReference booking = dbFirestore.collection("Booking");
+        ApiFuture<QuerySnapshot> query = booking.get();
+        QuerySnapshot querySnapshot = query.get();
+        List<Map<String, Object>> events = new ArrayList<>();
 
+        for (QueryDocumentSnapshot document : querySnapshot) {
+            Booking bookingData = document.toObject(Booking.class);
+            Map<String, Object> event = new HashMap<>();
+            event.put("title", bookingData.getFacilityID().getFacilityID() + ": " + bookingData.getCustomerID().getCustomerName());
+            event.put("start", bookingData.getBookingDate() + "T" + bookingData.getBookingStartTime());
+            event.put("end", bookingData.getBookingDate() + "T" + bookingData.getBookingEndTime());
+            events.add(event);
+        }
+        return events;
+    }
 }

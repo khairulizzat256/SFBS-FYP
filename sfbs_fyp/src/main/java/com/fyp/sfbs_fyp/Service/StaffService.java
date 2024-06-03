@@ -29,19 +29,26 @@ public class StaffService {
     public List<Staff> getStaffList() throws FirebaseAuthException {
         List<Staff> staffList = new ArrayList<>();
 
-        ListUsersPage page = FirebaseAuth.getInstance().listUsers(null);
+        //ListUsersPage page = FirebaseAuth.getInstance().listUsers(null);
        
-        while (page != null) {
-            for (UserRecord userRecord : page.getValues()) {
-                Staff staff = new Staff();
-                staff.setStaffID(userRecord.getUid());
-                staff.setStaffEmail(userRecord.getEmail());
-                staff.setStaffName(userRecord.getDisplayName());
-                staff.setStaffPhone(userRecord.getPhoneNumber());
+        // while (page != null) {
+        //     for (UserRecord userRecord : page.getValues()) {
+        //         Staff staff = new Staff();
+        //         staff.setStaffID(userRecord.getUid());
+        //         staff.setStaffEmail(userRecord.getEmail());
+        //         staff.setStaffName(userRecord.getDisplayName());
+        //         staff.setStaffPhone(userRecord.getPhoneNumber());
                 
-                staffList.add(staff);
-            }
-            page = page.getNextPage();
+        //         staffList.add(staff);
+        //     }
+        //     page = page.getNextPage();
+
+        //Get from Firestore
+        try {
+            List<Staff> staffListFromFirestore = firestore.collection("Staff").get().get().toObjects(Staff.class);
+            staffList.addAll(staffListFromFirestore);
+        } catch (Exception e) {
+            System.err.println("Error getting documents: " + e);
         }
         return staffList;
     }

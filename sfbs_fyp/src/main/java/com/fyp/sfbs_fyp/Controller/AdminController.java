@@ -1,15 +1,19 @@
 package com.fyp.sfbs_fyp.Controller;
 
+import java.util.concurrent.ExecutionException;
+
 import org.checkerframework.checker.units.qual.s;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fyp.sfbs_fyp.Service.StaffService;
+import com.fyp.sfbs_fyp.Model.Booking;
 import com.fyp.sfbs_fyp.Model.Staff;
 import com.fyp.sfbs_fyp.Service.AuthenticationService;
-
+import com.fyp.sfbs_fyp.Service.BookingService;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.servlet.http.HttpSession;
@@ -20,24 +24,30 @@ import org.springframework.ui.Model;
 @Controller
 @RequestMapping("/Admin")
 public class AdminController {
-    AuthenticationService user = new AuthenticationService();
+
+    @Autowired
+    private AuthenticationService user;
+    @Autowired
+    private StaffService staffService;
+    @Autowired
+    private BookingService bookingService;
     
     // Admin dashboard
     @GetMapping("/dashboard")
-    public String dashboard(@RequestParam("uid") String uid, Model model, HttpSession session) throws FirebaseAuthException{    
+    public String dashboard(@RequestParam("uid") String uid, Model model, HttpSession session) throws FirebaseAuthException, InterruptedException, ExecutionException{    
         
         //Check User ID Authentication
         user.Authentication(uid);
-        session.setAttribute("user",uid);
+        
+        session.setAttribute("user",staffService.getStaff(uid));
 
-        System.out.println(session.getAttribute("uid"));
+        System.out.println("Check user login id: "+ session.getAttribute("user"));
         
         //Get Staff List
-        StaffService staffService = new StaffService();
         model.addAttribute("staffList", staffService.getStaffList());
        
         //Get Booking List
-        //TODO: Get Booking List
+        model.addAttribute("bookingList", bookingService.retrieveBookingList());
         //Get Report List
         //TODO: Get Report List
 
@@ -54,7 +64,7 @@ public class AdminController {
 
     @GetMapping("/editStaff")
     public String editStaff(@RequestParam("uid") String staffID, Model model) throws FirebaseAuthException {
-        StaffService staffService = new StaffService();
+
         model.addAttribute("staff", staffService.getStaff(staffID));
         return "EditStaff";
     }
@@ -71,8 +81,6 @@ public class AdminController {
                             @RequestParam("staffPhone") String staffPhone,
                             @RequestParam("staffRole") String staffRole,
                             HttpSession session) throws FirebaseAuthException {
-
-        StaffService staffService = new StaffService();
         Staff newstaff = new Staff("", staffName, staffemail, staffPhone, staffRole);
         System.out.println("\n\n\nSAVE USER\n\n\n");
         staffService.saveStaff(newstaff);
@@ -82,7 +90,7 @@ public class AdminController {
 
     @GetMapping("/deleteStaff")
     public String deleteStaff(@RequestParam("uid") String staffID, Model model, HttpSession session) throws FirebaseAuthException {
-        StaffService staffService = new StaffService();
+
         staffService.deleteStaff(staffID);
         return "redirect:/Admin/dashboard?uid=" + session.getAttribute("user");
     }
