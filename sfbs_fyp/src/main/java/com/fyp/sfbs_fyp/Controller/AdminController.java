@@ -14,6 +14,7 @@ import com.fyp.sfbs_fyp.Model.Booking;
 import com.fyp.sfbs_fyp.Model.Staff;
 import com.fyp.sfbs_fyp.Service.AuthenticationService;
 import com.fyp.sfbs_fyp.Service.BookingService;
+import com.fyp.sfbs_fyp.Service.FacilityService;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.servlet.http.HttpSession;
@@ -31,6 +32,8 @@ public class AdminController {
     private StaffService staffService;
     @Autowired
     private BookingService bookingService;
+    @Autowired
+    private FacilityService FacilityService;
     
     // Admin dashboard
     @GetMapping("/dashboard")
@@ -40,14 +43,12 @@ public class AdminController {
         user.Authentication(uid);
         
         session.setAttribute("user",staffService.getStaff(uid));
-
-        System.out.println("Check user login id: "+ session.getAttribute("user"));
-        
         //Get Staff List
         model.addAttribute("staffList", staffService.getStaffList());
-       
         //Get Booking List
         model.addAttribute("bookingList", bookingService.retrieveBookingList());
+        //Get Facility List
+        model.addAttribute("facilityList", FacilityService.retrieveFacilityList());
         //Get Report List
         //TODO: Get Report List
 

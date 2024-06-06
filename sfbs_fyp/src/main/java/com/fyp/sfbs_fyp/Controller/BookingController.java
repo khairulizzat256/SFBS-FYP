@@ -16,6 +16,7 @@ import com.fyp.sfbs_fyp.Model.Customer;
 import com.fyp.sfbs_fyp.Model.Facility;
 import com.fyp.sfbs_fyp.Service.BookingService;
 import com.fyp.sfbs_fyp.Service.CustomerService;
+import com.fyp.sfbs_fyp.Service.FacilityService;
 
 
 @Controller
@@ -26,6 +27,8 @@ public class BookingController {
     BookingService bookingService;
     @Autowired
     CustomerService customerService;
+    @Autowired
+    FacilityService facilityService;
 
     @PostMapping("/confirmbooking")
     public String confirmBooking(@RequestBody Map<String, Object> bookingData, Model model) throws InterruptedException, ExecutionException {
@@ -37,7 +40,9 @@ public class BookingController {
 
         // Extract booking details
         Facility facility = new Facility();
-        facility.setFacilityID((String) bookingData.get("facility"));
+        //facility.setFacilityID((String) bookingData.get("facility"));
+
+        facility = facilityService.getFacility((String) bookingData.get("facility"));
 
         Booking booking = new Booking();
         booking.setFacilityID(facility);
@@ -60,8 +65,12 @@ public class BookingController {
       
         booking.setBookingStartTime((String) bookingData.get("bookingStartTime"));
         booking.setBookingEndTime((String) bookingData.get("bookingEndTime"));
+        booking.setStatus("Reserved");
 
+        //get the total amount by multiplying the facility price with the duration
+        double totalAmount = facility.getFacilityPrice() * bookingService.GetDuration(booking.getBookingStartTime(), booking.getBookingEndTime());
 
+        booking.setTotalamount(totalAmount);
         // Include company details if booking type is "Company"
         if ("Company".equals(bookingData.get("bookingType"))) {
             Company company = new Company(
@@ -85,7 +94,7 @@ public class BookingController {
 
         // Add booking details to model
         model.addAttribute("booking", booking);
-        System.out.println(booking.toString() + "\n" + customer.toString());
+        System.out.println(booking.toString() + "\n" + customer.toString() + "\n" + facility.toString());
         //print all company details
 
         return "confirmBooking";

@@ -4,6 +4,8 @@ import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.fyp.sfbs_fyp.Model.Facility;
+
 
 
 
@@ -11,5 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/facility")
 public class FacilityController {
-    
-    }
+
+    //do save facility in Firestore
+    //do update facility in Firestore
+    //do delete facility in Firestore
+
+}

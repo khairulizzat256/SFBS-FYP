@@ -15,6 +15,27 @@ public class Booking {
     private Facility facilityID;
     private Customer customerID;
     private Company companyID;
+    private String status;
+    private Double totalamount;
+
+    
+    
+    
+    public Booking(String bookingID, String bookingType, String bookingDate, String bookingStartTime,
+            String bookingEndTime, String description, Facility facilityID, Customer customerID, Company companyID,
+            String status, Double totalamount) {
+        this.bookingID = bookingID;
+        this.bookingType = bookingType;
+        this.bookingDate = bookingDate;
+        this.bookingStartTime = bookingStartTime;
+        this.bookingEndTime = bookingEndTime;
+        this.description = description;
+        this.facilityID = facilityID;
+        this.customerID = customerID;
+        this.companyID = companyID;
+        this.status = status;
+        this.totalamount = totalamount;
+    }
 
     //Constructor with CompanyID
     public Booking(String bookingID, String bookingType, String bookingDate, String bookingStartTime, String bookingEndTime, String description, Facility facilityID, Customer customerID, Company companyID) {
@@ -92,6 +113,22 @@ public class Booking {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setTotalamount(Double totalamount) {
+        this.totalamount = totalamount;
+    }
+
+    public Double getTotalamount() {
+        return totalamount;
     }
 
     @PropertyName("facility")

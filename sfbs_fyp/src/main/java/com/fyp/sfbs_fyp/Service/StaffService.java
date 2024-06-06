@@ -54,6 +54,7 @@ public class StaffService {
     }
 
     // Get Staff
+    @SuppressWarnings("null")
     public Staff getStaff(String staffID) throws FirebaseAuthException {
         Staff staff = new Staff();
         UserRecord userRecord = FirebaseAuth.getInstance().getUser(staffID);
@@ -61,6 +62,14 @@ public class StaffService {
         staff.setStaffEmail(userRecord.getEmail());
         staff.setStaffName(userRecord.getDisplayName());
         staff.setStaffPhone(userRecord.getPhoneNumber());
+
+        //Get from Firestore but only set the staff role
+        try {
+            Staff staffFromFirestore = firestore.collection("Staff").document(staffID).get().get().toObject(Staff.class);
+            staff.setStaffRole(staffFromFirestore.getStaffRole());
+        } catch (Exception e) {
+            System.err.println("Error getting documents: " + e);
+        }
         
         return staff;
     }

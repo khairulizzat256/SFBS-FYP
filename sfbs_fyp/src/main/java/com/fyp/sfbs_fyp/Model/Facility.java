@@ -58,5 +58,9 @@ public class Facility {
         this.facilityCloseTime = facilityCloseTime;
     }
 
+    public String toString() {
+        return "Facility Name: " + facilityName + "\nFacility ID: " + facilityID + "\nFacility Price: " + facilityPrice + "\nFacility Open Time: " + facilityOpenTime + "\nFacility Close Time: " + facilityCloseTime;
+    }
+
   
 }

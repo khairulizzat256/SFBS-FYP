@@ -97,11 +97,21 @@ public class BookingService {
         for (QueryDocumentSnapshot document : querySnapshot) {
             Booking bookingData = document.toObject(Booking.class);
             Map<String, Object> event = new HashMap<>();
-            event.put("title", bookingData.getFacilityID().getFacilityID() + ": " + bookingData.getCustomerID().getCustomerName());
+            event.put("title", bookingData.getFacilityID().getFacilityName() + ": " + bookingData.getCustomerID().getCustomerName());
             event.put("start", bookingData.getBookingDate() + "T" + bookingData.getBookingStartTime());
             event.put("end", bookingData.getBookingDate() + "T" + bookingData.getBookingEndTime());
             events.add(event);
         }
         return events;
+    }
+
+    public double GetDuration(String startTime, String endTime) {
+        int startHour = Integer.parseInt(startTime.substring(0, 2));
+        int startMinute = Integer.parseInt(startTime.substring(3, 5));
+        int endHour = Integer.parseInt(endTime.substring(0, 2));
+        int endMinute = Integer.parseInt(endTime.substring(3, 5));
+
+        double duration = (endHour - startHour) + (endMinute - startMinute) / 60.0;
+        return duration;
     }
 }
