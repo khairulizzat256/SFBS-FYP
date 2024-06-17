@@ -4,7 +4,6 @@ import org.springframework.stereotype.Controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.fyp.sfbs_fyp.Model.Facility;
 
 
 

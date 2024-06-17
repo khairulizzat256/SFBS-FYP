@@ -54,9 +54,22 @@
   <strong th:text="${message}"></strong>
 </div>
 
-
 <!-- Main Content -->
 <div class="container">
+  <!-- Filter Buttons -->
+  <div class="text-center">
+    <div class="btn-group my-4" role="group" aria-label="Facility Filter">
+      <button type="button" class="btn btn-outline-primary active" onclick="filterEvents('All')">All</button>
+      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Futsal')">Futsal</button>
+      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Badminton')">Badminton</button>
+      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Tennis')">Tennis</button>
+      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Basketball')">Basketball</button>
+      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Ping Pong')">Ping Pong</button>
+      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Squash')">Squash</button>
+    </div>
+  </div>
+  
+
   <div id="calendar" class="mb-4"></div>
 
   <!-- Modal for Booking Form -->
@@ -142,6 +155,8 @@
 
 <!-- JavaScript to handle form actions -->
 <script>
+  var calendar; 
+
   function handleBookingTypeChange() {
     const bookingType = document.getElementById('bookingType').value;
     if (bookingType === 'Company') {
@@ -170,7 +185,7 @@
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        return response.text(); // Expecting text/html for Thymeleaf template
+        return response.text(); 
     })
     .then(html => {
         document.open();
@@ -181,51 +196,104 @@
         console.error('Error:', error);
         alert('Booking failed. Please try again.');
     });
+  }
+
+  function filterEvents(facility) {
+    calendar.getEvents().forEach(event => {
+      if (facility === 'All' || event.extendedProps.facility === facility) {
+        event.setProp('display', 'auto');
+      } else {
+        event.setProp('display', 'none');
+      }
+    });
+    setActiveButton(facility);
+  }
+
+  function setActiveButton(facility) {
+  const buttons = document.querySelectorAll('.btn-group .btn');
+  buttons.forEach(button => {
+    if (button.textContent.trim() === facility || (facility === 'All' && button.textContent.trim() === 'All')) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+  });
 }
 
+document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+  var today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
 
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: 'dayGridMonth',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,dayGridWeek,timeGridDay' // Add week and day views
+    },
+    views: {
+      dayGridMonth: { buttonText: 'Month' },
+      dayGridWeek: { buttonText: 'Week' },
+      timeGridDay: { buttonText: 'Day' }
+    },
+    validRange: {
+      start: today // Disable past dates
+    },
+    selectable: true, // Enable selectable functionality
+    selectOverlap: function(event) {
+      return event.rendering === 'background';
+    },
+    eventTimeFormat: {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    },
+    select: function(info) {
+      if (info.endStr !== info.startStr) { // Check if end time is different from start time
+        document.getElementById('bookingDate').value = info.startStr.substring(0, 10); // Extract date
+        document.getElementById('bookingStartTime').value = info.start.toTimeString().substring(0, 5);
+        document.getElementById('bookingEndTime').value = info.end.toTimeString().substring(0, 5);
+        var bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
+        bookingModal.show();
+      }
+    },
+    events: function(fetchInfo, successCallback, failureCallback) {
+      fetch('/booking/events')
+        .then(response => response.json())
+        .then(events => {
+          var now = new Date();
+          events = events.filter(event => new Date(event.start) >= now); // Remove past events
+          events = events.map(event => {
+            event.start = new Date(event.start).toISOString();
+            event.end = new Date(event.end).toISOString();
+            event.extendedProps = { facility: event.facility }; // Ensure facility is part of extendedProps
+            return event;
+          });
+          successCallback(events);
+        })
+        .catch(error => {
+          console.error('Error fetching events:', error);
+          failureCallback(error);
+        });
+    },
+    dateClick: function(info) {
+      calendar.changeView('timeGridDay', info.dateStr); // Change to timeGridDay view
+    },
+    eventClick: function(info) {
+      const eventTitle = info.event.title;
+      const eventStart = info.event.start;
+      const eventEnd = info.event.end;
 
-  document.addEventListener('DOMContentLoaded', function() {
-      var calendarEl = document.getElementById('calendar');
-      var calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
-          events: function(fetchInfo, successCallback, failureCallback) {
-              fetch('/booking/events')
-                  .then(response => response.json())
-                  .then(events => {
-                      // Convert event times to ISO strings if needed
-                      events = events.map(event => {
-                          event.start = new Date(event.start).toISOString();
-                          event.end = new Date(event.end).toISOString();
-                          return event;
-                      });
-                      successCallback(events);
-                  })
-                  .catch(error => {
-                      console.error('Error fetching events:', error);
-                      failureCallback(error);
-                  });
-          },
-          dateClick: function(info) {
-              document.getElementById('bookingDate').value = info.dateStr;
-              var bookingModal = new bootstrap.Modal(document.getElementById('bookingModal'));
-              bookingModal.show();
-          },
-          eventClick: function(info) {
-              const eventTitle = info.event.title;
-              const eventStart = info.event.start;
-              const eventEnd = info.event.end;
+      const formattedDate = new Date(eventStart).toLocaleDateString('en-GB');
+      const formattedStartTime = new Date(eventStart).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      const formattedEndTime = new Date(eventEnd).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-              const formattedDate = new Date(eventStart).toLocaleDateString('en-GB');
-              const formattedStartTime = new Date(eventStart).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-              const formattedEndTime = new Date(eventEnd).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-              const message = `Booked: ${eventTitle}\nDate: ${formattedDate}\nStart at: ${formattedStartTime}\nEnd at: ${formattedEndTime}`;
-              alert(message);
-          }
-      });
-      calendar.render();
+      const message = `Booked: ${eventTitle}\nDate: ${formattedDate}\nStart at: ${formattedStartTime}\nEnd at: ${formattedEndTime}`;
+      alert(message);
+    }
   });
+  calendar.render();
+});
 </script>
 
 <!-- Bootstrap JS Bundle with Popper -->

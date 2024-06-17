@@ -100,6 +100,7 @@ public class BookingService {
             event.put("title", bookingData.getFacilityID().getFacilityName() + ": " + bookingData.getCustomerID().getCustomerName());
             event.put("start", bookingData.getBookingDate() + "T" + bookingData.getBookingStartTime());
             event.put("end", bookingData.getBookingDate() + "T" + bookingData.getBookingEndTime());
+            event.put("facility", bookingData.getFacilityID().getFacilityName()); // Add facility to event
             events.add(event);
         }
         return events;
@@ -113,5 +114,12 @@ public class BookingService {
 
         double duration = (endHour - startHour) + (endMinute - startMinute) / 60.0;
         return duration;
+    }
+
+    public void cancelBooking(Booking booking) {
+        // Set booking status to "Cancelled"
+        booking.setStatus("Cancelled");
+        // Save booking to Firestore
+        saveBooking(booking);
     }
 }

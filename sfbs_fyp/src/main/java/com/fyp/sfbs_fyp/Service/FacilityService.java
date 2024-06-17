@@ -81,8 +81,6 @@ public class FacilityService {
                 // Add the facility data to the list
                 facilityList.add(facilityData);
     
-                // Print the facility data
-                System.out.println(facilityData.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -2,7 +2,6 @@ package com.fyp.sfbs_fyp.Controller;
 
 import java.util.concurrent.ExecutionException;
 
-import org.checkerframework.checker.units.qual.s;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +40,6 @@ public class AdminController {
         
         //Check User ID Authentication
         user.Authentication(uid);
-        
         session.setAttribute("user",staffService.getStaff(uid));
         //Get Staff List
         model.addAttribute("staffList", staffService.getStaffList());
@@ -82,18 +80,36 @@ public class AdminController {
                             @RequestParam("staffPhone") String staffPhone,
                             @RequestParam("staffRole") String staffRole,
                             HttpSession session) throws FirebaseAuthException {
+
         Staff newstaff = new Staff("", staffName, staffemail, staffPhone, staffRole);
         System.out.println("\n\n\nSAVE USER\n\n\n");
         staffService.saveStaff(newstaff);
-        //model.addAttribute("staff", staffService.getStaff(staffID));
-        return "redirect:/Admin/dashboard?uid=" + session.getAttribute("user");
+        
+        Staff user = (Staff) session.getAttribute("user");
+        String uid = user.getStaffID();
+        return "redirect:/Admin/dashboard?uid=" + uid;
     }
 
     @GetMapping("/deleteStaff")
     public String deleteStaff(@RequestParam("uid") String staffID, Model model, HttpSession session) throws FirebaseAuthException {
+        Staff user = (Staff) session.getAttribute("user");
+        String uid = user.getStaffID();
 
         staffService.deleteStaff(staffID);
-        return "redirect:/Admin/dashboard?uid=" + session.getAttribute("user");
+        
+        return "redirect:/Admin/dashboard?uid=" + uid;
+    }
+
+    @GetMapping("/cancelBooking")
+    public String cancelBooking(@RequestParam("bookingID") String bookingID, Model model, HttpSession session) throws FirebaseAuthException, InterruptedException, ExecutionException {
+        Booking booking = bookingService.retrieveBookingData(bookingID);
+        bookingService.cancelBooking(booking);
+
+        Staff user = (Staff) session.getAttribute("user");
+        String uid = user.getStaffID();
+       
+        
+        return "redirect:/Admin/dashboard?uid="+ uid;
     }
     
     @GetMapping("/forgotPassword")
