@@ -66,6 +66,7 @@ public class BookingController {
         booking.setBookingStartTime((String) bookingData.get("bookingStartTime"));
         booking.setBookingEndTime((String) bookingData.get("bookingEndTime"));
         booking.setStatus("Reserved");
+        booking.setpaymentType((String) bookingData.get("paymentType"));
 
         //get the total amount by multiplying the facility price with the duration
         double totalAmount = facility.getFacilityPrice() * bookingService.GetDuration(booking.getBookingStartTime(), booking.getBookingEndTime());
@@ -94,7 +95,7 @@ public class BookingController {
 
         // Add booking details to model
         model.addAttribute("booking", booking);
-        System.out.println(booking.toString() + "\n" + customer.toString() + "\n" + facility.toString());
+        System.out.println(booking.toString());
         //print all company details
 
         return "confirmBooking";

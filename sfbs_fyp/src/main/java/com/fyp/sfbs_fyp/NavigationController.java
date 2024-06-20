@@ -16,11 +16,6 @@ public class NavigationController {
     @Autowired
     BookingService bookingService;
 
-    @GetMapping("/")
-    public String test() {
-        return "test"; 
-    }
-
     @GetMapping("/home")
     public String home() {
         return "home"; 

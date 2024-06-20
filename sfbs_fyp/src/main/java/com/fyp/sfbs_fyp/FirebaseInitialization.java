@@ -19,6 +19,10 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -34,6 +38,7 @@ import java.util.concurrent.ExecutionException;
 public class FirebaseInitialization {
 
     private Firestore firestore;
+    private Storage storage;
 
     @PostConstruct
     public void Initialization() {
@@ -72,7 +77,7 @@ public class FirebaseInitialization {
             .setCredentials(GoogleCredentials.fromStream(serviceAccount))
             .build();
             firestore = firestoreOptions.getService();
-            System.out.println("FIRESTORE CONNECTION ESTABLISHED!\n\n");
+            System.out.println("FIRESTORE CONNECTION ESTABLISHED!");
             // Count the total run of the application in Firestore
             runCountFirestore();
             
@@ -80,6 +85,21 @@ public class FirebaseInitialization {
             System.out.println("\nFirestore Initialization Error: " + e.getMessage());
             e.printStackTrace();
         }
+        
+        try (InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("ServiceAccountKey.json")) {
+            if (serviceAccount == null) {
+                throw new IOException("ServiceAccountKey.json not found");
+            }
+            storage = StorageOptions.newBuilder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .build()
+                    .getService();
+            System.out.println("FIREBASE STORAGE CONNECTION ESTABLISHED!\n\n");
+        } catch (Exception e) {
+            System.out.println("\nFirebase Storage Initialization Error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         
     }
 
@@ -144,6 +164,19 @@ public class FirebaseInitialization {
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    public String uploadFile(String bucketName, String objectName, InputStream inputStream, String contentType) {
+        try {
+            BlobId blobId = BlobId.of(bucketName, objectName);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
+            storage.create(blobInfo, inputStream);
+            return String.format("https://storage.googleapis.com/%s/%s", bucketName, objectName);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

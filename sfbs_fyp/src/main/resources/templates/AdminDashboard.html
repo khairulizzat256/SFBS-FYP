@@ -100,7 +100,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="booking : ${bookingList}" >
+                        <tr th:each="booking : ${bookingList}" th:if="${booking.status == 'Reserved'}">
                             <td th:text="${booking.bookingID}"></td>
                             <td th:text="${booking.facilityID.facilityID}"></td>
                             <td>
@@ -156,11 +156,53 @@
             </table>
         </div>
 
-        <!-- Report Section -->
-        <div id="report-section" class="content-section" style="display:none;">
-            <h2>Report List</h2>
-            <!-- Report content goes here -->
-        </div>
+<!-- Report Section -->
+<div id="report-section" class="content-section" style="display:none;">
+    <h2>Report List</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Report Date</th>
+                    <th>Total Sales (RM)</th>
+                    <th>Bookings</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="report : ${reportList}">
+                    <td th:text="${#dates.format(report.reportDate, 'yyyy-MM-dd')}"></td>
+                    <td th:text="${report.totalSale}"></td>
+                    <td>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Customer</th>
+                                    <th>Facility</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Booking Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="booking : ${report.bookingID}">
+                                    <td th:text="${booking.bookingID}"></td>
+                                    <td th:text="${booking.customerID.customerName}"></td>
+                                    <td th:text="${booking.facilityID.facilityName}"></td>
+                                    <td th:text="${booking.bookingStartTime}"></td>
+                                    <td th:text="${booking.bookingEndTime}"></td>
+                                    <td th:text="${booking.status}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
 
         <!-- Facility Section -->
     <div id="facility-section" class="content-section" style="display:none;">

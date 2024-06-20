@@ -59,17 +59,26 @@
   <!-- Filter Buttons -->
   <div class="text-center">
     <div class="btn-group my-4" role="group" aria-label="Facility Filter">
-      <button type="button" class="btn btn-outline-primary active" onclick="filterEvents('All')">All</button>
-      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Futsal')">Futsal</button>
-      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Badminton')">Badminton</button>
-      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Tennis')">Tennis</button>
-      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Basketball')">Basketball</button>
-      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Ping Pong')">Ping Pong</button>
-      <button type="button" class="btn btn-outline-primary" onclick="filterEvents('Squash')">Squash</button>
+      <button type="button" class="btn btn-outline-dark active" onclick="filterEvents('All')">All</button>
+      <button type="button" class="btn btn-outline-dark" onclick="filterEvents('Futsal')">Futsal</button>
+      <button type="button" class="btn btn-outline-dark" onclick="filterEvents('Badminton')">Badminton</button>
+      <button type="button" class="btn btn-outline-dark" onclick="filterEvents('Tennis')">Tennis</button>
+      <button type="button" class="btn btn-outline-dark" onclick="filterEvents('Basketball')">Basketball</button>
+      <button type="button" class="btn btn-outline-dark" onclick="filterEvents('Ping Pong')">Ping Pong</button>
+      <button type="button" class="btn btn-outline-dark" onclick="filterEvents('Squash')">Squash</button>
     </div>
   </div>
   
 
+  <p>
+  BOOKING INSTRUCTION <br>
+  1. Choose the date by click on the calendar. <br>
+  2. Select your slot time. <br>
+  3. Fill the booking form.  <br>
+  4. Select payment method.  <br>
+  5. Review your booking details in Inbox mail.
+  </p>
+  
   <div id="calendar" class="mb-4"></div>
 
   <!-- Modal for Booking Form -->
@@ -138,9 +147,16 @@
                 <input type="text" class="form-control" id="eventName" name="eventName">
               </div>
               <div class="mb-3">
-                <label for="additionalService" class="form-label">Additional Services</label>
+                <label for="additionalService" class="form-label">Additional Services Request</label>
                 <input type="textarea" class="form-control" id="additionalService" name="additionalService">
               </div>
+            </div>
+            <div class="mb-3">
+              <label for="paymentType" class="form-label">Choose Your Payment Type</label>
+              <select class="form-select" id="paymentType" name="paymentType" required>
+                <option value="Pay at Counter">Pay at Counter</option>
+                <option value="Online Transfer/QR">Online Transfer/QR</option>
+              </select>
             </div>
             <div class="text-center"></div>
               <button type="button" class="btn btn-success" onclick="submitBooking()">Make a Booking</button>
@@ -229,16 +245,19 @@ document.addEventListener('DOMContentLoaded', function() {
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
-      right: 'dayGridMonth,dayGridWeek,timeGridDay' // Add week and day views
+      right: 'dayGridMonth,timeGridDay' // Add week and day views
     },
     views: {
       dayGridMonth: { buttonText: 'Month' },
-      dayGridWeek: { buttonText: 'Week' },
       timeGridDay: { buttonText: 'Day' }
     },
     validRange: {
-      start: today // Disable past dates
+      start: today
     },
+    selectConstraint: {
+            startTime: '08:00', // Start time for selectable range
+            endTime: '23:00' // End time for selectable range
+        },
     selectable: true, // Enable selectable functionality
     selectOverlap: function(event) {
       return event.rendering === 'background';

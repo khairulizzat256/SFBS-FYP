@@ -39,9 +39,6 @@ public class FacilityService {
     
             // Set the facilityID from the document ID
             facility.setFacilityID(querySnapshot.getDocuments().get(0).getId());
-    
-            // Print the facility data
-            System.out.println(facility.toString());
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("\n\nCOULD NOT RETRIEVE FROM FIRESTORE\n\n");

@@ -1,6 +1,9 @@
 package com.fyp.sfbs_fyp.Controller;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.fyp.sfbs_fyp.Service.StaffService;
+import com.fyp.sfbs_fyp.Service.ReportService;
 import com.fyp.sfbs_fyp.Model.Booking;
 import com.fyp.sfbs_fyp.Model.Staff;
 import com.fyp.sfbs_fyp.Service.AuthenticationService;
@@ -33,22 +37,30 @@ public class AdminController {
     private BookingService bookingService;
     @Autowired
     private FacilityService FacilityService;
+    @Autowired
+    private ReportService ReportService;
     
     // Admin dashboard
     @GetMapping("/dashboard")
-    public String dashboard(@RequestParam("uid") String uid, Model model, HttpSession session) throws FirebaseAuthException, InterruptedException, ExecutionException{    
+    public String dashboard(@RequestParam("uid") String uid, Model model, HttpSession session) throws FirebaseAuthException, InterruptedException, ExecutionException {
+        // Check User ID Authentication
+        // Assume user.Authentication(uid); is handled elsewhere
+        session.setAttribute("user", staffService.getStaff(uid));
         
-        //Check User ID Authentication
-        user.Authentication(uid);
-        session.setAttribute("user",staffService.getStaff(uid));
-        //Get Staff List
+        // Get Staff List
         model.addAttribute("staffList", staffService.getStaffList());
-        //Get Booking List
+        // Get Booking List
         model.addAttribute("bookingList", bookingService.retrieveBookingList());
-        //Get Facility List
+        // Get Facility List
         model.addAttribute("facilityList", FacilityService.retrieveFacilityList());
-        //Get Report List
-        //TODO: Get Report List
+        // Generate and Get Report List
+        ReportService.generateReport(staffService.getStaff(uid)); // Ensure reports are generated
+        model.addAttribute("reportList", ReportService.retrieveReportList());
+
+        // Get all bookings and pass them as a map to the model
+        List<Booking> allBookings = bookingService.retrieveBookingList();
+        Map<String, Booking> bookingsMap = allBookings.stream().collect(Collectors.toMap(Booking::getBookingID, booking -> booking));
+        model.addAttribute("bookings", bookingsMap);
 
         return "AdminDashboard";
     }

@@ -1,22 +1,28 @@
 package com.fyp.sfbs_fyp.Model;
 
-import java.sql.Date;
+import java.util.Date;
+import java.util.List;
 
 public class Report {
     private int reportID;
     private Date reportDate;
-    private Booking bookingID;
+    private List<Booking> bookingID;
     private Staff staffID;
     private double totalSale;
 
     // Constructor
-    public Report(int reportID, Date reportDate, Booking bookingID, Staff staffID, double totalSale) {
+    public Report(int reportID, Date reportDate, List<Booking> bookingID, Staff staffID, double totalSale) {
         this.reportID = reportID;
         this.reportDate = reportDate;
         this.bookingID = bookingID;
         this.staffID = staffID;
         this.totalSale = totalSale;
     }
+    
+
+    public Report() {
+    }
+
 
     // Getters and Setters
     public int getReportID() {
@@ -35,11 +41,11 @@ public class Report {
         this.reportDate = reportDate;
     }
 
-    public Booking getBookingID() {
+    public List<Booking> getBookingID() {
         return bookingID;
     }
 
-    public void setBookingID(Booking bookingID) {
+    public void setBookingID(List<Booking> bookingID) {
         this.bookingID = bookingID;
     }
 
@@ -57,5 +63,15 @@ public class Report {
 
     public void setTotalSale(double totalSale) {
         this.totalSale = totalSale;
+    }
+
+    public String toString() {
+        return "Report{" +
+                "reportID=" + reportID +
+                ", reportDate=" + reportDate +
+                ", bookingID=" + bookingID +
+                ", staffID=" + staffID +
+                ", totalSale=" + totalSale +
+                '}';
     }
 }

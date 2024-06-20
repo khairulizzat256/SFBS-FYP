@@ -16,14 +16,14 @@ public class Booking {
     private Customer customerID;
     private Company companyID;
     private String status;
+    private String paymentType;
     private Double totalamount;
-
-    
-    
+    private String paymentProof;
+    private String paymentStatus;
     
     public Booking(String bookingID, String bookingType, String bookingDate, String bookingStartTime,
             String bookingEndTime, String description, Facility facilityID, Customer customerID, Company companyID,
-            String status, Double totalamount) {
+            String status, String paymentType, String paymentProof, Double totalamount, String paymentStatus) {
         this.bookingID = bookingID;
         this.bookingType = bookingType;
         this.bookingDate = bookingDate;
@@ -34,6 +34,26 @@ public class Booking {
         this.customerID = customerID;
         this.companyID = companyID;
         this.status = status;
+        this.paymentType = paymentType;
+        this.paymentProof = paymentProof;
+        this.totalamount = totalamount;
+        this.paymentStatus = paymentStatus;
+    }
+
+    public Booking(String bookingID, String bookingType, String bookingDate, String bookingStartTime,
+            String bookingEndTime, String description, Facility facilityID, Customer customerID, Company companyID,
+            String status, String paymentType, Double totalamount) {
+        this.bookingID = bookingID;
+        this.bookingType = bookingType;
+        this.bookingDate = bookingDate;
+        this.bookingStartTime = bookingStartTime;
+        this.bookingEndTime = bookingEndTime;
+        this.description = description;
+        this.facilityID = facilityID;
+        this.customerID = customerID;
+        this.companyID = companyID;
+        this.status = status;
+        this.paymentType = paymentType;
         this.totalamount = totalamount;
     }
 
@@ -123,6 +143,30 @@ public class Booking {
         return status;
     }
 
+    public void setpaymentType(String paymentType) {
+        this.paymentType = paymentType;
+    }
+
+    public String getpaymentType() {
+        return paymentType;
+    }
+    
+    public String getPaymentProof() {
+        return paymentProof;
+    }
+
+    public void setPaymentProof(String paymentProof) {
+        this.paymentProof = paymentProof;
+    }
+
+    public String getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
     public void setTotalamount(Double totalamount) {
         this.totalamount = totalamount;
     }
@@ -160,6 +204,6 @@ public class Booking {
         return "Booking ID: " + bookingID + "\nBooking Type: " + bookingType + "\nBooking Date: " + bookingDate
                 + "\nBooking Start Time: " + bookingStartTime + "\nBooking End Time: " + bookingEndTime
                 + "\nDescription: " + description + "\nFacility ID: " + facilityID + "\nCustomer ID: " + customerID
-                + "\nCompany ID: " + companyID;
+                + "\nCompany ID: " + companyID + "\nPaymentType: " + paymentType + "\nPaymentStatus: " + paymentType;
     }
 }
