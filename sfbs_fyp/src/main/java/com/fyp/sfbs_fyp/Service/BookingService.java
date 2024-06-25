@@ -1,5 +1,6 @@
 package com.fyp.sfbs_fyp.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,10 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.firebase.cloud.FirestoreClient;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 @Service
 public class BookingService {
@@ -121,5 +126,39 @@ public class BookingService {
         booking.setStatus("Cancelled");
         // Save booking to Firestore
         saveBooking(booking);
+    }
+
+    public void CheckInBooking(Booking booking) {
+        //
+        booking.setStatus("Occupied");
+        // Save booking to Firestore
+        saveBooking(booking);
+    }
+
+    public void PaidBooking(Booking booking) {
+        //
+        booking.setPaymentStatus("Paid");
+        // Save booking to Firestore
+        saveBooking(booking);
+    }
+
+    public void CompleteBooking(Booking booking) {
+        //
+        booking.setStatus("Completed");
+        // Save booking to Firestore
+        saveBooking(booking);
+    }
+
+    //fetch all image in firebase storage
+    public byte[] fetchImage(String bookingID) throws IOException {
+        Storage storage = StorageOptions.getDefaultInstance().getService();
+        BlobId blobId = BlobId.of("sfbs-19116.appspot.com", "paymentProof/" + bookingID + ".jpg");
+        Blob blob = storage.get(blobId);
+    
+        if (blob == null || !blob.exists()) {
+            throw new IOException("Image not found in storage");
+        }
+    
+        return blob.getContent();
     }
 }

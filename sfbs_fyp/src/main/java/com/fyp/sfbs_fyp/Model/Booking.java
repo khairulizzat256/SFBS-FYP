@@ -18,12 +18,11 @@ public class Booking {
     private String status;
     private String paymentType;
     private Double totalamount;
-    private String paymentProof;
     private String paymentStatus;
     
     public Booking(String bookingID, String bookingType, String bookingDate, String bookingStartTime,
             String bookingEndTime, String description, Facility facilityID, Customer customerID, Company companyID,
-            String status, String paymentType, String paymentProof, Double totalamount, String paymentStatus) {
+            String status, String paymentType, Double totalamount, String paymentStatus) {
         this.bookingID = bookingID;
         this.bookingType = bookingType;
         this.bookingDate = bookingDate;
@@ -35,7 +34,6 @@ public class Booking {
         this.companyID = companyID;
         this.status = status;
         this.paymentType = paymentType;
-        this.paymentProof = paymentProof;
         this.totalamount = totalamount;
         this.paymentStatus = paymentStatus;
     }
@@ -149,14 +147,6 @@ public class Booking {
 
     public String getpaymentType() {
         return paymentType;
-    }
-    
-    public String getPaymentProof() {
-        return paymentProof;
-    }
-
-    public void setPaymentProof(String paymentProof) {
-        this.paymentProof = paymentProof;
     }
 
     public String getPaymentStatus() {

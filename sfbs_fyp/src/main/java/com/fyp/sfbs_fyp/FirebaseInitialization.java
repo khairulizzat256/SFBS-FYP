@@ -94,6 +94,7 @@ public class FirebaseInitialization {
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build()
                     .getService();
+
             System.out.println("FIREBASE STORAGE CONNECTION ESTABLISHED!\n\n");
         } catch (Exception e) {
             System.out.println("\nFirebase Storage Initialization Error: " + e.getMessage());
@@ -111,6 +112,11 @@ public class FirebaseInitialization {
     @Bean
     public Firestore firestore() {
         return firestore;
+    }
+
+    @Bean
+    public Storage storage() {
+        return storage;
     }
 
     private void runCount() {
@@ -164,19 +170,6 @@ public class FirebaseInitialization {
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    public String uploadFile(String bucketName, String objectName, InputStream inputStream, String contentType) {
-        try {
-            BlobId blobId = BlobId.of(bucketName, objectName);
-            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
-            storage.create(blobInfo, inputStream);
-            return String.format("https://storage.googleapis.com/%s/%s", bucketName, objectName);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
     }
 }

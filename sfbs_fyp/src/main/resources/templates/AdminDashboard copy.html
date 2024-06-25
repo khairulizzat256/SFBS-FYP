@@ -73,75 +73,73 @@
        
         
         <!-- Booking Section -->
-<!-- Booking Section -->
-<div id="booking-section" class="content-section">
-    <h2>Booking List</h2>
+        <div id="booking-section" class="content-section">
+            <h2>Booking List</h2>
 
-    <div class="container text-center">
-        <div id="calendar-container">
-            <div id="calendar" class="mb-7"></div>
-        </div>
-    </div>
+            <div class="container text-center">
+                <div id="calendar-container">
+                <div id="calendar" class="mb-7"></div>
+                </div>
+            </div>
 
-    <div class="table-responsive mt-4">
-        <table class="table table-bordered table-striped" th:if="${bookingList}">
-            <thead>
-                <tr>
-                    <th>Booking ID</th>
-                    <th>Facility</th>
-                    <th>Customer Detail</th>
-                    <th>Booking Type</th>
-                    <th>Booking Date</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Status</th>
-                    <th>Total Amount</th>
-                    <th>Company Name</th>
-                    <th class="text-center">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="booking : ${bookingList}" th:if="${booking.status == 'Reserved' or booking.status == 'Occupied'}">
-                    <td th:text="${booking.bookingID}"></td>
-                    <td>
-                        <p th:text="${booking.facilityID.facilityID}"></p>
-                        <p th:text="${booking.facilityID.facilityName}"></p>
-                    </td>
-                    <td>
-                        <p th:text="${booking.customerID.customerName}"></p>
-                        <p th:text="${booking.customerID.customerPhone}"></p>
-                        <p th:text="${booking.customerID.customerEmail}"></p>
-                    </td>
-                    <td th:text="${booking.bookingType}"></td>
-                    <td th:text="${booking.bookingDate}"></td>
-                    <td th:text="${booking.bookingStartTime}"></td>
-                    <td th:text="${booking.bookingEndTime}"></td>
-                    <td>
-                        <div class="badge" th:classappend="${booking.status == 'Reserved'} ? 'bg-warning text-dark' : 'bg-info text-white'" th:text="${booking.status}"></div>
-                        <div class="badge bg-dark" th:text="${booking.getpaymentType()}"></div>
-                    </td>
-                    <td>
-                        <div th:text="${booking.totalamount}"></div>
-                        <div class="badge" th:classappend="${booking.paymentStatus == 'Unpaid'} ? 'bg-danger' : 'bg-success'" th:text="${booking.paymentStatus}" th:onclick="showPaymentProofModal('${booking.bookingID}')"></div>
-                    </td>
-                    <td th:text="${booking.companyID != null ? booking.companyID.companyName : 'N/A'}">N/A</td>
-                    <td class="text-center">
-                        <div th:if="${booking.status == 'Reserved'}">
-                            <a th:href="@{/Admin/CheckInBooking(bookingID=${booking.bookingID})}" class="btn btn-success">Check In</a>
-                            <a th:href="@{/Admin/cancelBooking(bookingID=${booking.bookingID})}" class="btn btn-danger">Cancel</a>
-                        </div>
-                        <div th:if="${booking.status == 'Occupied'}">
-                            <a th:href="@{/Admin/CheckOutBooking(bookingID=${booking.bookingID})}" class="btn btn-warning">Check Out</a>
-                        </div>
-                        <div th:if="${booking.paymentStatus == 'Unpaid'}">
-                            <a th:href="@{/Admin/PaidBooking(bookingID=${booking.bookingID})}" class="btn btn-primary">Mark as Paid</a>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+            <div class="table-responsive mt-4">
+                <table class="table table-bordered table-striped" th:if="${bookingList}">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Facility</th>
+                            <th>Customer Detail</th>
+                            <th>Booking Type</th>
+                            <th>Booking Date</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Status</th>
+                            <th>Total Amount</th>
+                            <th>Company Name</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="booking : ${bookingList}" th:if="${booking.status == 'Reserved' or booking.status == 'Occupied'}">
+                            <td th:text="${booking.bookingID}"></td>
+                            <td>
+                                <p th:text="${booking.facilityID.facilityID}"></p>
+                                <p th:text="${booking.facilityID.facilityName}"></p>
+                            </td>
+                            <td>
+                                <p th:text="${booking.customerID.customerName}"></p>
+                                <p th:text="${booking.customerID.customerPhone}"></p>
+                                <p th:text="${booking.customerID.customerEmail}"></p>
+                            </td>
+                            <td th:text="${booking.bookingType}"></td>
+                            <td th:text="${booking.bookingDate}"></td>
+                            <td th:text="${booking.bookingStartTime}"></td>
+                            <td th:text="${booking.bookingEndTime}"></td>
+                            <td>
+                                <div class="badge" th:classappend="${booking.status == 'Reserved'} ? 'bg-warning text-dark' : 'bg-info text-white'" th:text="${booking.status}"></div>
+                                <div class="badge bg-dark" th:text="${booking.getpaymentType()}"></div>
+                            </td>
+                            <td>
+                                <div th:text="${booking.totalamount}"></div>
+                                <div class="badge" th:classappend="${booking.paymentStatus == 'Unpaid'} ? 'bg-danger' : 'bg-success'" th:text="${booking.paymentStatus}"></div>
+                            </td>
+                            <td th:text="${booking.companyID != null ? booking.companyID.companyName : 'N/A'}">N/A</td>
+                            <td class="text-center">
+                                <div th:if="${booking.status == 'Reserved'}">
+                                    <a th:href="@{/Admin/CheckInBooking(bookingID=${booking.bookingID})}" class="btn btn-success">Check In</a>
+                                    <a th:href="@{/Admin/cancelBooking(bookingID=${booking.bookingID})}" class="btn btn-danger">Cancel</a>
+                                </div>
+                                <div th:if="${booking.status == 'Occupied'}">
+                                    <a th:href="@{/Admin/CheckOutBooking(bookingID=${booking.bookingID})}" class="btn btn-warning">Check Out</a>
+                                </div>
+                                <div th:if="${booking.paymentStatus == 'Unpaid'}">
+                                    <a th:href="@{/Admin/PaidBooking(bookingID=${booking.bookingID})}" class="btn btn-primary">Mark as Paid</a>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
         <!-- Staff Section -->
         <div id="staff-section" class="content-section" style="display:none;">
@@ -177,14 +175,8 @@
 <!-- Report Section -->
 <div id="report-section" class="content-section" style="display:none;">
     <h2>Report List</h2>
-    <div class="mb-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="Search for bookings..." onkeyup="searchTable()">
-    </div>
-    <div class="mb-3">
-        <button onclick="sortTable(0)" class="btn btn-primary">Sort by Date</button>
-    </div>
     <div class="table-responsive">
-        <table id="reportTable" class="table table-bordered table-striped">
+        <table class="table table-bordered table-striped">
             <thead>
                 <tr>
                     <th>Report Date</th>
@@ -192,7 +184,7 @@
                     <th>Bookings</th>
                 </tr>
             </thead>
-            <tbody id="tableBody">
+            <tbody>
                 <tr th:each="report : ${reportList}">
                     <td th:text="${#dates.format(report.reportDate, 'yyyy-MM-dd')}"></td>
                     <td th:text="${report.totalSale}"></td>
@@ -215,11 +207,7 @@
                                     <td th:text="${booking.facilityID.facilityName}"></td>
                                     <td th:text="${booking.bookingStartTime}"></td>
                                     <td th:text="${booking.bookingEndTime}"></td>
-                                    <td>
-                                        <div class="badge bg-dark" th:text="${booking.status}"></div>
-                                        <div class="badge bg-dark" th:text="${booking.getpaymentType}"></div>
-                                        <div class="badge bg-dark" th:text="${booking.paymentStatus}"></div>
-                                    </td>
+                                    <td th:text="${booking.status}"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -228,13 +216,7 @@
             </tbody>
         </table>
     </div>
-
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center" id="paginationNumbers"></ul>
-    </nav>
 </div>
-</div>
-
 
 
 
@@ -269,22 +251,7 @@
         </div>
     </div>
 
-<!-- Payment Proof Modal -->
-<div class="modal fade" id="paymentProofModal" tabindex="-1" aria-labelledby="paymentProofModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentProofModalLabel">Payment Proof</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <img id="paymentProofImage" src="" alt="Payment Proof" class="img-fluid">
-            </div>
-        </div>
     </div>
-</div>
-
-    
 
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -365,145 +332,6 @@
         });
         calendar.render();
         });
-
-        function showPaymentProofModal(bookingID) {
-            fetch(`/fetchImages?bookingID=${bookingID}`)
-                .then(response => {
-                    if (response.ok) {
-                        return response.blob();
-                    } else {
-                        throw new Error('Failed to fetch payment proof');
-                    }
-                })
-                .then(blob => {
-                    var imgUrl = URL.createObjectURL(blob);
-                    document.getElementById('paymentProofImage').src = imgUrl;
-                    var modal = new bootstrap.Modal(document.getElementById('paymentProofModal'));
-                    modal.show();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-
-        function searchTable() {
-    var input, filter, table, tr, td, i, j, txtValue;
-    input = document.getElementById("searchInput");
-    filter = input.value.toLowerCase();
-    table = document.getElementById("reportTable");
-    tr = table.getElementsByTagName("tr");
-    for (i = 1; i < tr.length; i++) {
-        tr[i].style.display = "none";
-        td = tr[i].getElementsByTagName("td");
-        for (j = 0; j < td.length; j++) {
-            if (td[j]) {
-                txtValue = td[j].textContent || td[j].innerText;
-                if (txtValue.toLowerCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                    break;
-                }
-            }
-        }
-    }
-}
-
-function sortTable(n) {
-    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-    table = document.getElementById("reportTable");
-    switching = true;
-    dir = "asc";
-    while (switching) {
-        switching = false;
-        rows = table.rows;
-        for (i = 1; i < (rows.length - 1); i++) {
-            shouldSwitch = false;
-            x = rows[i].getElementsByTagName("TD")[n];
-            y = rows[i + 1].getElementsByTagName("TD")[n];
-            if (dir == "asc") {
-                if (new Date(x.innerHTML.toLowerCase()) > new Date(y.innerHTML.toLowerCase())) {
-                    shouldSwitch = true;
-                    break;
-                }
-            } else if (dir == "desc") {
-                if (new Date(x.innerHTML.toLowerCase()) < new Date(y.innerHTML.toLowerCase())) {
-                    shouldSwitch = true;
-                    break;
-                }
-            }
-        }
-        if (shouldSwitch) {
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
-            switchcount++;
-        } else {
-            if (switchcount == 0 && dir == "asc") {
-                dir = "desc";
-                switching = true;
-            }
-        }
-    }
-    displayTable(currentPage);
-}
-
-var currentPage = 1;
-var rowsPerPage = 20;
-
-function displayTable(page) {
-    var table = document.getElementById("reportTable");
-    var rows = table.getElementsByTagName("tr");
-    var totalRows = rows.length - 1;
-    var start = (page - 1) * rowsPerPage + 1;
-    var end = start + rowsPerPage - 1;
-
-    for (var i = 1; i <= totalRows; i++) {
-        if (i >= start && i <= end) {
-            rows[i].style.display = "";
-        } else {
-            rows[i].style.display = "none";
-        }
-    }
-    updatePaginationNumbers(totalRows);
-}
-
-function updatePaginationNumbers(totalRows) {
-    var paginationNumbers = document.getElementById("paginationNumbers");
-    paginationNumbers.innerHTML = "";
-    var totalPages = Math.ceil(totalRows / rowsPerPage);
-
-    for (var i = 1; i <= totalPages; i++) {
-        var pageItem = document.createElement("li");
-        pageItem.className = "page-item" + (i === currentPage ? " active" : "");
-        pageItem.innerHTML = `<a class="page-link" href="#" onclick="goToPage(${i})">${i}</a>`;
-        paginationNumbers.appendChild(pageItem);
-    }
-}
-
-function goToPage(page) {
-    currentPage = page;
-    displayTable(currentPage);
-}
-
-function previousPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        displayTable(currentPage);
-    }
-}
-
-function nextPage() {
-    var table = document.getElementById("reportTable");
-    var rows = table.getElementsByTagName("tr");
-    var totalRows = rows.length - 1;
-    var totalPages = Math.ceil(totalRows / rowsPerPage);
-
-    if (currentPage < totalPages) {
-        currentPage++;
-        displayTable(currentPage);
-    }
-}
-
-// Initial display
-displayTable(currentPage);
     </script>
 </body>
 </html>

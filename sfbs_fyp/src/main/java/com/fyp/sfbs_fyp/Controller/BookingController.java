@@ -4,12 +4,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import com.fyp.sfbs_fyp.Model.Booking;
 import com.fyp.sfbs_fyp.Model.Company;
 import com.fyp.sfbs_fyp.Model.Customer;
@@ -29,6 +38,8 @@ public class BookingController {
     CustomerService customerService;
     @Autowired
     FacilityService facilityService;
+    @Autowired
+    private Storage storage;
 
     @PostMapping("/confirmbooking")
     public String confirmBooking(@RequestBody Map<String, Object> bookingData, Model model) throws InterruptedException, ExecutionException {
@@ -101,25 +112,55 @@ public class BookingController {
         return "confirmBooking";
     }
     @PostMapping("/savebooking")
-    public String saveBooking(@ModelAttribute Booking booking, Model model) {
-        try {
-            // Save customer to Firestore if not exists
-            if (!customerService.isUserExist(booking.getCustomerID().getCustomerEmail())) {
-                booking.getCustomerID().setCustomerID(customerService.generateCustomerID());
-                customerService.saveCustomer(booking.getCustomerID());
-            }
-            booking.getCustomerID().setCustomerID(customerService.getUID(booking.getCustomerID().getCustomerEmail()));
-
-             // Save booking to Firestore
-            bookingService.saveBooking(booking);
-            model.addAttribute("success", "Booking successfully saved");
-            return "redirect:/booking?message=Booking successfully saved";
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            model.addAttribute("message", "Failed to save booking: " + e.getMessage());
-            return "redirect:/booking";
+public String saveBooking(@ModelAttribute Booking booking, @RequestParam(value = "paymentProof", required = false) MultipartFile file, Model model) {
+    try {
+        if ("Online Transfer/QR".equals(booking.getpaymentType()) && file != null && !file.isEmpty()) {
+            // Save the file to Firebase Storage
+            String fileName = "paymentProof/" + booking.getBookingID() + ".jpg";
+            String bucketName = "sfbs-19116.appspot.com";
+            BlobId blobId = BlobId.of(bucketName, fileName);
+            BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                    .setContentType("image/" + getFileExtension(file.getOriginalFilename()))
+                    .build();
+            storage.create(blobInfo, file.getBytes());
+            
+            // Get the URL of the uploaded file
+            String fileUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, fileName);
+            booking.setPaymentStatus("Paid");
+            // Store the file URL in Firestore
+           // booking.setPaymentProof(fileUrl);
+        } else {
+            booking.setPaymentStatus("Unpaid");
+            // If payment type is 'Pay at Counter', do not set payment proof
+            //booking.setPaymentProof(null);
         }
+
+        // Save customer to Firestore if not exists
+        if (!customerService.isUserExist(booking.getCustomerID().getCustomerEmail())) {
+            booking.getCustomerID().setCustomerID(customerService.generateCustomerID());
+            customerService.saveCustomer(booking.getCustomerID());
+        }
+        booking.getCustomerID().setCustomerID(customerService.getUID(booking.getCustomerID().getCustomerEmail()));
+
+        // Save booking to Firestore
+        bookingService.saveBooking(booking);
+        model.addAttribute("success", "Booking successfully saved");
+        return "redirect:/booking?message=Booking successfully saved";
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        String message = "Failed to save booking:" + e.getMessage();
+        model.addAttribute("message", message);
+        return "redirect:/booking?message="+message;
+    }
+}
+
+    private String getFileExtension(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            return "";
+        }
+        int dotIndex = fileName.lastIndexOf('.');
+        return dotIndex == -1 ? "" : fileName.substring(dotIndex + 1);
     }
 
     @GetMapping("/events")

@@ -1,11 +1,16 @@
 package com.fyp.sfbs_fyp.Controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +23,7 @@ import com.fyp.sfbs_fyp.Model.Staff;
 import com.fyp.sfbs_fyp.Service.AuthenticationService;
 import com.fyp.sfbs_fyp.Service.BookingService;
 import com.fyp.sfbs_fyp.Service.FacilityService;
+import com.google.cloud.storage.Blob;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.servlet.http.HttpSession;
@@ -123,6 +129,47 @@ public class AdminController {
         
         return "redirect:/Admin/dashboard?uid="+ uid;
     }
+
+    
+    @GetMapping("/CheckInBooking")
+    public String CheckInBooking(@RequestParam("bookingID") String bookingID, Model model, HttpSession session) throws FirebaseAuthException, InterruptedException, ExecutionException {
+        Booking booking = bookingService.retrieveBookingData(bookingID);
+        bookingService.CheckInBooking(booking);
+        Staff user = (Staff) session.getAttribute("user");
+        String uid = user.getStaffID();
+    
+        return "redirect:/Admin/dashboard?uid="+ uid;
+    }
+
+    @GetMapping("/PaidBooking")
+    public String PaidBooking(@RequestParam("bookingID") String bookingID, Model model, HttpSession session) throws FirebaseAuthException, InterruptedException, ExecutionException {
+        Booking booking = bookingService.retrieveBookingData(bookingID);
+        bookingService.PaidBooking(booking);
+        Staff user = (Staff) session.getAttribute("user");
+        String uid = user.getStaffID();
+    
+        return "redirect:/Admin/dashboard?uid="+ uid;
+    }
+
+    @GetMapping("/CheckOutBooking")
+    public String CompletedBooking(@RequestParam("bookingID") String bookingID, Model model, HttpSession session) throws FirebaseAuthException, InterruptedException, ExecutionException {
+        Booking booking = bookingService.retrieveBookingData(bookingID);
+        bookingService.CompleteBooking(booking);
+        Staff user = (Staff) session.getAttribute("user");
+        String uid = user.getStaffID();
+    
+        return "redirect:/Admin/dashboard?uid="+ uid;
+    }
+
+    //fetch image by Booking ID
+    @GetMapping("/fetchImages")
+    public ResponseEntity<byte[]> fetchImages(@RequestParam("bookingID") String bookingID) throws IOException {
+    byte[] imageData = bookingService.fetchImage(bookingID);
+    return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + bookingID + ".jpg\"")
+            .contentType(MediaType.IMAGE_JPEG)
+            .body(imageData);
+}
     
     @GetMapping("/forgotPassword")
     public String forgotPasswordForm() {
