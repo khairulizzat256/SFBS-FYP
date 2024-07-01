@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
@@ -41,6 +45,25 @@ public class BookingController {
     @Autowired
     private Storage storage;
 
+    @GetMapping("/{bookingID}")
+    public String viewBookingDetails(@PathVariable("bookingID") String bookingID, Model model) {
+        try {
+            Booking booking = bookingService.retrieveBookingData(bookingID);
+
+            if (booking != null) {
+                model.addAttribute("booking", booking);
+                return "bookingDetails";
+            } else {
+                model.addAttribute("message", "Booking not found");
+                return "error";
+            }
+        } catch (Exception e) {
+            model.addAttribute("message", "An error occurred: " + e.getMessage());
+            return "error";
+        }
+    }
+
+
     @PostMapping("/confirmbooking")
     public String confirmBooking(@RequestBody Map<String, Object> bookingData, Model model) throws InterruptedException, ExecutionException {
         // Extract customer details
@@ -51,7 +74,6 @@ public class BookingController {
 
         // Extract booking details
         Facility facility = new Facility();
-        //facility.setFacilityID((String) bookingData.get("facility"));
 
         facility = facilityService.getFacility((String) bookingData.get("facility"));
 
@@ -62,17 +84,8 @@ public class BookingController {
         // Generate booking ID (example, replace with your logic)
         booking.setBookingID("booking" + new Date().getTime());
         System.out.println("Booking ID SET: " + booking.getBookingID());
-        // Set booking date to the selected date
-        // String bookingDateString = (String) bookingData.get("bookingDate");
-        // SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        // Date bookingDate = dateFormat.parse(bookingDateString);
+       
         booking.setBookingDate((String) bookingData.get("bookingDate"));
-        
-        // Parse the booking start and end times
-        // SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        // Date bookingStartTime = timeFormat.parse((String) bookingData.get("bookingStartTime"));
-        // Date bookingEndTime = timeFormat.parse((String) bookingData.get("bookingEndTime"));
-        //set the bookingstarttime and bookingendtime date same with bookingdate
       
         booking.setBookingStartTime((String) bookingData.get("bookingStartTime"));
         booking.setBookingEndTime((String) bookingData.get("bookingEndTime"));
@@ -112,48 +125,81 @@ public class BookingController {
         return "confirmBooking";
     }
     @PostMapping("/savebooking")
-public String saveBooking(@ModelAttribute Booking booking, @RequestParam(value = "paymentProof", required = false) MultipartFile file, Model model) {
-    try {
-        if ("Online Transfer/QR".equals(booking.getpaymentType()) && file != null && !file.isEmpty()) {
-            // Save the file to Firebase Storage
-            String fileName = "paymentProof/" + booking.getBookingID() + ".jpg";
-            String bucketName = "sfbs-19116.appspot.com";
-            BlobId blobId = BlobId.of(bucketName, fileName);
-            BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                    .setContentType("image/" + getFileExtension(file.getOriginalFilename()))
-                    .build();
-            storage.create(blobInfo, file.getBytes());
+    public String saveBooking(@ModelAttribute Booking booking, @RequestParam(value = "paymentProof", required = false) MultipartFile file, Model model) {
+        try {
+            try {
+                if ("Online Transfer/QR".equals(booking.getpaymentType()) && file != null && !file.isEmpty()) {
+                    System.out.println("File Name: " + file.getOriginalFilename());
+                    String fileName = "paymentProof/" + booking.getBookingID() + ".jpg";
+                    String bucketName = "sfbs-19116.appspot.com";
+                    BlobId blobId = BlobId.of(bucketName, fileName);
+                    BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                            .setContentType("image/" + getFileExtension(file.getOriginalFilename()))
+                            .build();
+                    storage.create(blobInfo, file.getBytes());
+                    
+                    // Get the URL of the uploaded file
+                    String fileUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, fileName);
+                    booking.setPaymentStatus("Paid");
+                    // Store the file URL in Firestore
+                // booking.setPaymentProof(fileUrl);
+                } else {
+                    booking.setPaymentStatus("Unpaid");
+                    // If payment type is 'Pay at Counter', do not set payment proof
+                    //booking.setPaymentProof(null);
+                }
+                
+            } catch (Exception e) {
+                e.printStackTrace();
+                String message = "Failed to save payment proof: " + e.getMessage();
+                model.addAttribute("message", message);
+                return "redirect:/booking?message="+message;
+            }
             
-            // Get the URL of the uploaded file
-            String fileUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, fileName);
-            booking.setPaymentStatus("Paid");
-            // Store the file URL in Firestore
-           // booking.setPaymentProof(fileUrl);
-        } else {
-            booking.setPaymentStatus("Unpaid");
-            // If payment type is 'Pay at Counter', do not set payment proof
-            //booking.setPaymentProof(null);
+
+            // Save customer to Firestore if not exists
+            try {
+                if (!customerService.isUserExist(booking.getCustomerID().getCustomerEmail())) {
+                    booking.getCustomerID().setCustomerID(customerService.generateCustomerID());
+                    customerService.saveCustomer(booking.getCustomerID());
+                }
+                booking.getCustomerID().setCustomerID(customerService.getUID(booking.getCustomerID().getCustomerEmail()));
+            } catch (Exception e) {
+                e.printStackTrace();
+                String message = "Failed to save customer: Invalid email and phone number";
+                model.addAttribute("message", message);
+                return "redirect:/booking?message="+message;
+            }
+            
+
+            // Save booking to Firestore
+            bookingService.saveBooking(booking);
+
+            // Trigger email sending
+            bookingService.sendEmailTrigger(booking);
+            model.addAttribute("success", "Booking successfully saved");
+            return "redirect:/booking?message=Booking successfully saved";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            String message = "Failed to save booking:" + e.getMessage();
+            model.addAttribute("message", message);
+            return "redirect:/booking?message="+message;
         }
-
-        // Save customer to Firestore if not exists
-        if (!customerService.isUserExist(booking.getCustomerID().getCustomerEmail())) {
-            booking.getCustomerID().setCustomerID(customerService.generateCustomerID());
-            customerService.saveCustomer(booking.getCustomerID());
-        }
-        booking.getCustomerID().setCustomerID(customerService.getUID(booking.getCustomerID().getCustomerEmail()));
-
-        // Save booking to Firestore
-        bookingService.saveBooking(booking);
-        model.addAttribute("success", "Booking successfully saved");
-        return "redirect:/booking?message=Booking successfully saved";
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        String message = "Failed to save booking:" + e.getMessage();
-        model.addAttribute("message", message);
-        return "redirect:/booking?message="+message;
     }
-}
+
+    @PostMapping("/cancelbooking")
+    public String cancelBooking(@RequestParam("bookingID") String bookingID, @RequestParam("description") String description, Model model) {
+        try {
+            bookingService.cancelBooking(bookingID, description);
+            return "redirect:/booking/"+bookingID;
+        } catch (Exception e) {
+            
+            return "redirect:/booking/"+bookingID;
+        }
+    }
+    
+
 
     private String getFileExtension(String fileName) {
         if (fileName == null || fileName.isEmpty()) {
