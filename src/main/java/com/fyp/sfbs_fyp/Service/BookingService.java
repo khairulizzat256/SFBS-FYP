@@ -77,7 +77,7 @@ public class BookingService {
     message.put("text", "Thank you for your booking. Please click the link below to view your booking details:\n" + 
                         "http://yourwebsite.com/booking/" + booking.getBookingID());
     message.put("html", "<p>Thank you for your booking. Please click the link below to view your booking details:</p>" +
-                        "<a href=\"http://localhost:8080/booking/" + booking.getBookingID() + "\">View Booking</a>");
+                        "<a href=\"https://sfbs-kelabkomuniticyberjaya-a3e4db06b778.herokuapp.com/booking/" + booking.getBookingID() + "\">View Booking</a>");
     
     emailData.put("message", message);
 
