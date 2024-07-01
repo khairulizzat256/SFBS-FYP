@@ -17,6 +17,11 @@ public class NavigationController {
     BookingService bookingService;
 
     @GetMapping("/")
+    public String defaultpage() {
+        return "home"; 
+    }
+
+    @GetMapping("/home")
     public String home() {
         return "home"; 
     }
@@ -28,7 +33,6 @@ public class NavigationController {
         }
 
         bookingService.retrieveBookingList();
-
         bookingService.getBookingEvents();
         model.addAttribute("response", bookingService.getBookingEvents());
 

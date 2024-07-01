@@ -2,6 +2,7 @@ package com.fyp.sfbs_fyp.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
@@ -30,6 +32,16 @@ public class BookingService {
         // Save booking to database
         DocumentReference docRef = dbFirestore.collection("Booking").document(booking.getBookingID());
             docRef.set(booking);
+    }
+
+    public void cancelBooking(String bookingID, String description) throws InterruptedException, ExecutionException {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        DocumentReference docRef = dbFirestore.collection("Booking").document(bookingID);
+        
+        ApiFuture<WriteResult> future = docRef.update("status", "Cancelled", "description", description);
+        
+        // Wait for the write result
+        future.get();
     }
 
     //retrieve booking data by bookingID
@@ -53,6 +65,25 @@ public class BookingService {
         }
         return bookingList;
     }
+
+    public void sendEmailTrigger(Booking booking) throws InterruptedException, ExecutionException {
+    Firestore dbFirestore = FirestoreClient.getFirestore();
+    Map<String, Object> emailData = new HashMap<>();
+    
+    emailData.put("to", Collections.singletonList(booking.getCustomerID().getCustomerEmail()));
+    
+    Map<String, String> message = new HashMap<>();
+    message.put("subject", "Booking Confirmation: " + booking.getBookingID());
+    message.put("text", "Thank you for your booking. Please click the link below to view your booking details:\n" + 
+                        "http://yourwebsite.com/booking/" + booking.getBookingID());
+    message.put("html", "<p>Thank you for your booking. Please click the link below to view your booking details:</p>" +
+                        "<a href=\"http://localhost:8080/booking/" + booking.getBookingID() + "\">View Booking</a>");
+    
+    emailData.put("message", message);
+
+    // Save email data to Firestore
+    dbFirestore.collection("mail").add(emailData);
+}
 
     //compare date and time of retrieved booking data with the date and time in firestore
     public boolean ValidateDateTime(String bookingDate, String bookingStartTime, String bookingEndTime, String facilityID) throws InterruptedException, ExecutionException {
@@ -95,10 +126,10 @@ public class BookingService {
     public List<Map<String, Object>> getBookingEvents() throws InterruptedException, ExecutionException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         CollectionReference booking = dbFirestore.collection("Booking");
-        ApiFuture<QuerySnapshot> query = booking.get();
+        ApiFuture<QuerySnapshot> query = booking.whereEqualTo("status", "Reserved").get();
         QuerySnapshot querySnapshot = query.get();
         List<Map<String, Object>> events = new ArrayList<>();
-
+    
         for (QueryDocumentSnapshot document : querySnapshot) {
             Booking bookingData = document.toObject(Booking.class);
             Map<String, Object> event = new HashMap<>();
@@ -110,6 +141,7 @@ public class BookingService {
         }
         return events;
     }
+    
 
     public double GetDuration(String startTime, String endTime) {
         int startHour = Integer.parseInt(startTime.substring(0, 2));
