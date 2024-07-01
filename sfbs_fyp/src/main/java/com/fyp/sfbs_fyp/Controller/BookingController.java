@@ -6,23 +6,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.storage.Blob;
+
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Bucket;
+
 import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+
 import com.fyp.sfbs_fyp.Model.Booking;
 import com.fyp.sfbs_fyp.Model.Company;
 import com.fyp.sfbs_fyp.Model.Customer;
@@ -139,6 +134,7 @@ public class BookingController {
                     storage.create(blobInfo, file.getBytes());
                     
                     // Get the URL of the uploaded file
+                    @SuppressWarnings("unused")
                     String fileUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, fileName);
                     booking.setPaymentStatus("Paid");
                     // Store the file URL in Firestore

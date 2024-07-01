@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,6 @@ import com.fyp.sfbs_fyp.Model.Staff;
 import com.fyp.sfbs_fyp.Service.AuthenticationService;
 import com.fyp.sfbs_fyp.Service.BookingService;
 import com.fyp.sfbs_fyp.Service.FacilityService;
-import com.google.cloud.storage.Blob;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.servlet.http.HttpSession;
