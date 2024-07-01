@@ -72,7 +72,6 @@
 
        
         
-        <!-- Booking Section -->
 <!-- Booking Section -->
 <div id="booking-section" class="content-section">
     <h2>Booking List</h2>
@@ -84,7 +83,10 @@
     </div>
 
     <div class="table-responsive mt-4">
-        <table class="table table-bordered table-striped" th:if="${bookingList}">
+        <div th:if="${bookingList.empty}">
+            <p>There is no booking today.</p>
+        </div>
+        <table class="table table-bordered table-striped" th:if="${!bookingList.empty}">
             <thead>
                 <tr>
                     <th>Booking ID</th>
