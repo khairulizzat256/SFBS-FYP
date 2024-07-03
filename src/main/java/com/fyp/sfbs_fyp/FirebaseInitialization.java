@@ -83,7 +83,7 @@ public class FirebaseInitialization {
             System.out.println("\nFirestore Initialization Error: " + e.getMessage());
             e.printStackTrace();
         }
-        
+        //Initialize Firebase Storage
         try (InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("ServiceAccountKey.json")) {
             if (serviceAccount == null) {
                 throw new IOException("ServiceAccountKey.json not found");
