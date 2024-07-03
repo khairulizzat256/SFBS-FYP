@@ -151,8 +151,6 @@ public class BookingController {
                 model.addAttribute("message", message);
                 return "redirect:/booking?message="+message;
             }
-            
-
             // Save customer to Firestore if not exists
             try {
                 if (!customerService.isUserExist(booking.getCustomerID().getCustomerEmail())) {
@@ -166,8 +164,6 @@ public class BookingController {
                 model.addAttribute("message", message);
                 return "redirect:/booking?message="+message;
             }
-            
-
             // Save booking to Firestore
             bookingService.saveBooking(booking);
 
