@@ -127,7 +127,14 @@
                   </div>
                   <div class="mb-3">
                       <label for="customerPhone" class="form-label">Customer Phone</label>
-                      <input type="tel" class="form-control" id="customerPhone" name="customerPhone" required>
+                      <input type="tel" 
+                      class="form-control" 
+                      id="customerPhone" 
+                      name="customerPhone" 
+                      pattern="\+\d{10,}" 
+                      required
+                      title="Phone number must start with + and followed by at least 10 digits (e.g., +1234567890)">
+                      <small class="form-text">Phone number must start with + and include at least 10 digits (e.g., +1234567890).</small>
                   </div>
                   <div class="mb-3">
                       <label for="customerEmail" class="form-label">Customer Email</label>
@@ -193,7 +200,22 @@
         }
         data[key] = value;
     });
+    //check if email and phone number is valid
+    if (!data.customerEmail.includes('@') || !data.customerEmail.includes('.')) {
+        alert("Email must be in valid format");
+        valid = false;
+    }
+    //check if phone number is valid and must number only
+    
+    if (!data.customerPhone.includes('+')) {
+        alert("Phone number must start with + and include at least 10 digits (e.g., +1234567890)." );
+        valid = false;
+    }
 
+    if (isNaN(data.customerPhone)) {
+        alert("Phone number must be number only.");
+        valid = false;
+    }
     // Check if booking type is Company and validate company fields
     if (data.bookingType === "Company") {
         const companyFields = ["companyName", "companyAddress", "eventName", "additionalService"];

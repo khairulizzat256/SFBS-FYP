@@ -56,8 +56,6 @@
                         Action
                       </button>
                       <ul class="dropdown-menu dropdown-menu-end"> <!-- dropdown-menu-end aligns the menu to the right -->
-                        <li><a class="dropdown-item" href="#">Staff Profile</a></li>
-                        <li><a class="dropdown-item" href="#">Setting</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" onclick="signOut()" href="#">LOGOUT</a></li>
                       </ul>
@@ -104,7 +102,10 @@
             </thead>
             <tbody>
                 <tr th:each="booking : ${bookingList}" th:if="${booking.status == 'Reserved' or booking.status == 'Occupied'}">
-                    <td th:text="${booking.bookingID}"></td>
+                    <td>
+                        <a th:text="${booking.bookingID}" th:href="@{/booking/{id}(id=${booking.bookingID})}"></a>
+                    </td>
+                    
                     <td>
                         <p th:text="${booking.facilityID.facilityID}"></p>
                         <p th:text="${booking.facilityID.facilityName}"></p>
@@ -168,7 +169,6 @@
                         <td th:text="${staff.staffEmail}"></td>
                         <td th:text="${staff.staffRole}"></td>
                         <td>
-                            <a th:href="@{/Admin/editStaff(uid=${staff.staffID})}" class="btn btn-primary">Edit</a>
                             <a th:href="@{/Admin/deleteStaff(uid=${staff.staffID})}" class="btn btn-danger">Delete</a>
                         </td>
                     </tr>
@@ -184,6 +184,7 @@
     </div>
     <div class="mb-3">
         <button onclick="sortTable(0)" class="btn btn-primary">Sort by Date</button>
+        <button onclick="printReport()" class="btn btn-secondary">Print Report</button>
     </div>
     <div class="table-responsive">
         <table id="reportTable" class="table table-bordered table-striped">
@@ -271,20 +272,6 @@
         </div>
     </div>
 
-<!-- Payment Proof Modal -->
-<div class="modal fade" id="paymentProofModal" tabindex="-1" aria-labelledby="paymentProofModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentProofModalLabel">Payment Proof</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <img id="paymentProofImage" src="" alt="Payment Proof" class="img-fluid">
-            </div>
-        </div>
-    </div>
-</div>
 
     
 
@@ -367,26 +354,6 @@
         });
         calendar.render();
         });
-
-        function showPaymentProofModal(bookingID) {
-            fetch(`/fetchImages?bookingID=${bookingID}`)
-                .then(response => {
-                    if (response.ok) {
-                        return response.blob();
-                    } else {
-                        throw new Error('Failed to fetch payment proof');
-                    }
-                })
-                .then(blob => {
-                    var imgUrl = URL.createObjectURL(blob);
-                    document.getElementById('paymentProofImage').src = imgUrl;
-                    var modal = new bootstrap.Modal(document.getElementById('paymentProofModal'));
-                    modal.show();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
 
         function searchTable() {
     var input, filter, table, tr, td, i, j, txtValue;
@@ -506,6 +473,16 @@ function nextPage() {
 
 // Initial display
 displayTable(currentPage);
+
+function printReport() {
+    var printContents = document.getElementById("report-section").innerHTML;
+    var originalContents = document.body.innerHTML;
+    document.body.innerHTML = printContents;
+    window.print();
+    document.body.innerHTML = originalContents;
+}
+
+
     </script>
 </body>
 </html>

@@ -147,4 +147,21 @@ public class StaffService {
         Firestore firestore = FirestoreClient.getFirestore();
         firestore.collection("Staff").document(staffID).delete();
     }
+
+    public String checkExistingUser(Staff newstaff) throws FirebaseAuthException {
+        ListUsersPage page = FirebaseAuth.getInstance().listUsers(null);
+        while (page != null) {
+            for (UserRecord userRecord : page.getValues()) {
+                if (userRecord.getEmail().equals(newstaff.getStaffEmail())) {
+                    return "User already exists with email: " + newstaff.getStaffEmail();
+                }
+
+                if (userRecord.getPhoneNumber().equals(newstaff.getStaffPhone())) {
+                    return "User already exists with phone number: " + newstaff.getStaffPhone();
+                }
+            }
+            page = page.getNextPage();
+        }
+        return "";
+    }
 }
