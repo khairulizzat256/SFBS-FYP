@@ -1,5 +1,6 @@
 package com.fyp.sfbs_fyp.Service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,10 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fyp.sfbs_fyp.Model.Booking;
 import com.google.api.core.ApiFuture;
+import com.google.api.gax.paging.Page;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
@@ -27,6 +30,14 @@ import com.google.cloud.storage.StorageOptions;
 @Service
 public class BookingService {
     
+
+    private final Storage storage;
+
+    @Autowired
+    public BookingService(Storage storage) {
+        this.storage = storage;
+
+    }
     public void saveBooking(Booking booking) {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         // Save booking to database
@@ -91,11 +102,11 @@ public class BookingService {
         CollectionReference booking = dbFirestore.collection("Booking");
         ApiFuture<QuerySnapshot> query = booking.get();
         QuerySnapshot querySnapshot = query.get();
-
+    
         // Check if the booking date and time is available
         for (QueryDocumentSnapshot document : querySnapshot) {
             Booking bookingData = document.toObject(Booking.class);
-            if (bookingData.getFacilityID().getFacilityID().equals(facilityID)) {
+            if (bookingData.getFacilityID().getFacilityID().equals(facilityID) && "Reserved".equals(bookingData.getStatus())) {
                 if (bookingData.getBookingDate().equals(bookingDate)) {
                     if (bookingData.getBookingStartTime().equals(bookingStartTime) || bookingData.getBookingEndTime().equals(bookingEndTime)) {
                         return false;
@@ -103,24 +114,25 @@ public class BookingService {
                 }
             }
         }
-
-        //Check if the booking date and time not passed
+    
+        // Check if the booking date and time not passed
         if (bookingDate.compareTo(java.time.LocalDate.now().toString()) < 0) {
             return false;
         }
-
-        //Check if the booking start time and end time is not the same or the start time is not later than the end time
-        if(bookingStartTime.compareTo(bookingEndTime) >= 0) {
+    
+        // Check if the booking start time and end time is not the same or the start time is not later than the end time
+        if (bookingStartTime.compareTo(bookingEndTime) >= 0) {
             return false;
         }
-
-        //Check if the start time and end time is available (08:00 - 22:00)
-        if(bookingStartTime.compareTo("08:00") < 0 || bookingEndTime.compareTo("22:00") > 0) {
+    
+        // Check if the start time and end time is available (08:00 - 22:00)
+        if (bookingStartTime.compareTo("08:00") < 0 || bookingEndTime.compareTo("22:00") > 0) {
             return false;
         }
-
+    
         return true;
     }
+    
 
     //Get the event, date, start time and end time of the booking
     public List<Map<String, Object>> getBookingEvents() throws InterruptedException, ExecutionException {
@@ -181,16 +193,12 @@ public class BookingService {
         saveBooking(booking);
     }
 
-    //fetch all image in firebase storage
     public byte[] fetchImage(String bookingID) throws IOException {
-        Storage storage = StorageOptions.getDefaultInstance().getService();
         BlobId blobId = BlobId.of("sfbs-19116.appspot.com", "paymentProof/" + bookingID + ".jpg");
         Blob blob = storage.get(blobId);
-    
         if (blob == null || !blob.exists()) {
-            throw new IOException("Image not found in storage");
+            throw new FileNotFoundException("No such object: " + blobId.getName());
         }
-    
         return blob.getContent();
     }
 }

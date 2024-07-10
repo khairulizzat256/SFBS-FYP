@@ -47,8 +47,12 @@
                     <option value="Facility Manager">Facility Manager</option>
                 </select>
             </div>
+            <div th:if="${message}">
+                <div class="alert alert-warning" th:text="${message}"></div>
+            </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
+        <p th:if="${uid != null}">Current UID: <span th:text="${uid}"></span></p>
     </div>
 
     <!-- Bootstrap JS -->

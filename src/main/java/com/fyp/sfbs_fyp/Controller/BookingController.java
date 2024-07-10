@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -41,22 +41,34 @@ public class BookingController {
     private Storage storage;
 
     @GetMapping("/{bookingID}")
-    public String viewBookingDetails(@PathVariable("bookingID") String bookingID, Model model) {
-        try {
-            Booking booking = bookingService.retrieveBookingData(bookingID);
-
-            if (booking != null) {
-                model.addAttribute("booking", booking);
-                return "bookingDetails";
+public String viewBookingDetails(@PathVariable("bookingID") String bookingID, Model model) {
+    try {
+        Booking booking = bookingService.retrieveBookingData(bookingID);
+        
+        if (booking != null) {
+            if ("Paid".equals(booking.getPaymentStatus())) {
+                byte[] imageBytes = bookingService.fetchImage(bookingID);
+                if (imageBytes != null && imageBytes.length > 0) {
+                    String base64Image = Base64.getEncoder().encodeToString(imageBytes);
+                    model.addAttribute("image", base64Image);
+                } else {
+                    model.addAttribute("image", null);
+                }
             } else {
-                model.addAttribute("message", "Booking not found");
-                return "error";
+                model.addAttribute("image", null);
             }
-        } catch (Exception e) {
-            model.addAttribute("message", "An error occurred: " + e.getMessage());
+            model.addAttribute("booking", booking);
+            return "bookingDetails";
+        } else {
+            model.addAttribute("message", "Booking not found");
             return "error";
         }
+    } catch (Exception e) {
+        model.addAttribute("message", "An error occurred: " + e.getMessage());
+        return "error";
     }
+}
+
 
 
     @PostMapping("/confirmbooking")
