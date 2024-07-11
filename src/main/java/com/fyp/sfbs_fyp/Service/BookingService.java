@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.logging.log4j.util.PropertySource.Comparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,16 +67,28 @@ public class BookingService {
 
     //retrieve list booking using List
     public List<Booking> retrieveBookingList() throws InterruptedException, ExecutionException {
-        Firestore dbFirestore = FirestoreClient.getFirestore();
-        CollectionReference booking = dbFirestore.collection("Booking");
-        ApiFuture<QuerySnapshot> query = booking.get();
-        QuerySnapshot querySnapshot = query.get();
-        List<Booking> bookingList = new ArrayList<Booking>();
-        for (QueryDocumentSnapshot document : querySnapshot) {
-            bookingList.add(document.toObject(Booking.class));
-        }
-        return bookingList;
+    Firestore dbFirestore = FirestoreClient.getFirestore();
+    CollectionReference booking = dbFirestore.collection("Booking");
+    ApiFuture<QuerySnapshot> query = booking.get();
+    QuerySnapshot querySnapshot = query.get();
+    List<Booking> bookingList = new ArrayList<>();
+    
+    for (QueryDocumentSnapshot document : querySnapshot) {
+        bookingList.add(document.toObject(Booking.class));
     }
+    
+    // Sort by booking date and time in ascending order
+    bookingList.sort((b1, b2) -> {
+        int dateComparison = b1.getBookingDate().compareTo(b2.getBookingDate());
+        if (dateComparison == 0) {
+            return b1.getBookingStartTime().compareTo(b2.getBookingStartTime());
+        } else {
+            return dateComparison;
+        }
+    });
+    
+    return bookingList;
+}
 
     public void sendEmailTrigger(Booking booking) throws InterruptedException, ExecutionException {
     Firestore dbFirestore = FirestoreClient.getFirestore();
